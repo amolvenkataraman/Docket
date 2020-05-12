@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %} Register {% endblock %}
+
+{% block body %}
+<link href="{% static 'users/styles.css' %}" rel="stylesheet"/>
+  <div class="login-register-form">
+      <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+          <legend>Register</legend>
+          <!-- Display the register form -->
+          {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+          <button class="btn btn-outline-info" type="submit">Sign Up</button>
+        </div>
+      </form>
+      <div class="">
+        <!-- Provide link to sign in page -->
+        <small class="text-muted">Already have an account? <a href="{% url 'login' %}">Sign In</a></small>
+      </div>
+  </div>
+{% endblock %}
