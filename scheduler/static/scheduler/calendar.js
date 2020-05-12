@@ -13,7 +13,7 @@ var selectYear = document.getElementById("year");
 var selectMonth = document.getElementById("month");
 
 
-var createYear = generate_year_range(1970, 2050);
+var createYear = generate_year_range(currentYear, currentYear);
 /** or
 * createYear = generate_year_range( 1970, currentYear );
 */
@@ -92,7 +92,7 @@ function showCalendar(month, year) {
               cell.setAttribute("data-year", year);
               cell.setAttribute("data-month_name", months[month]);
               cell.className = "date-picker";
-              cell.innerHTML = "<span>" + date + "</span>";
+              cell.innerHTML = "<span>" + date + "</span>"
 
               if ( date === today.getDate() && year === today.getFullYear() && month === today.getMonth() ) {
                   cell.className = "date-picker selected";
