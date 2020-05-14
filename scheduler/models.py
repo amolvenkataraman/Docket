@@ -24,6 +24,7 @@ class Assignment(models.Model):
 
     def getinfo(self):
         ans = {
+            "id": self.id,
             "class": self.Class.name,
             "name": self.name,
             "deadline": str(self.deadline),
