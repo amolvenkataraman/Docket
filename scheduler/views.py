@@ -13,7 +13,6 @@ def index(request):
         assignments = Assignment.objects.filter(Class=class_)
         for assignment in assignments:
             context["assignments"][class_.name].append(assignment.getinfo())
-    print(context)
     return render(request, 'scheduler/schedule.html', context)
 
 def assignment(request):
