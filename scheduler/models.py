@@ -21,3 +21,15 @@ class Assignment(models.Model):
 
     def __str__(self):
         return f"{self.name} for {self.Class.name}. Due: {str(self.deadline)}"
+
+    def getinfo(self):
+        ans = {
+            "class": self.Class.name,
+            "name": self.name,
+            "deadline": str(self.deadline),
+            "url": self.url,
+            "description": self.description,
+            "graded": str(self.graded),
+            "priority": self.priority,
+        }
+        return ans

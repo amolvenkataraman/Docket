@@ -4,6 +4,27 @@
 {% block title %} Schedule {% endblock %}
 
 {% block script %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      assignments = JSON.parse("{{ assignments }}".replace(/&#x27;/g,'"'))
+      Object.keys(assignments).forEach(class_ => {
+        a = assignments[class_]
+        for (i = 0; i < a.length; i++)
+        {
+          d = new Date(a[i]['deadline'])
+          if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
+          {
+            document.querySelectorAll('.date-picker').forEach(dp => {
+              if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
+              {
+                dp.innerHTML += "<br>" + "<font size=\"2\">" + a[i]['name'] + "</font>"
+              }
+            })
+          }
+        }
+      })
+    })
+  </script>
 {% endblock %}
 
 {% block body %}
