@@ -1,11 +1,13 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .models import *
 
 import datetime
 import json
 
 # Create your views here.
+@login_required(login_url="login/")
 def index(request):
     context = {"assignments": {}}
     classes = request.user.class_student.all()
@@ -16,6 +18,7 @@ def index(request):
             context["assignments"][class_.name].append(assignment.getinfo())
     return render(request, 'scheduler/schedule.html', context)
 
+@login_required(login_url="login/")
 def add(request):
     if request.user.teacher == True:
         if request.method == 'GET':
@@ -40,3 +43,13 @@ def add(request):
             return HttpResponse("OK")
     else:
         return HttpResponse('Only teachers are allowed to access this.<br>Please contact me if you are a teacher and want administrative access.')
+
+@login_required(login_url="login/")
+def enroll(request):
+    if request.method == 'GET':
+        class_ = Class.objects.filter(id=request.GET.get('class'))[0]
+        if class_ in request.user.class_student.all():
+            return HttpResponse("You are already enrolled in this class")
+        return render(request, 'scheduler/enroll.html', class_.getinfo())
+    else:
+        #todo

@@ -18,7 +18,7 @@
             document.querySelectorAll('.date-picker').forEach(dp => {
               if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
               {
-                dp.innerHTML += '<br>' + '<button type="button" class="unstyled-button assignment-button" data-assignmentclass="' + class_ + '"data-assignmentno="' + i + '" data-toggle="modal" data-target="#assignmentModal"><font size="2">' + a[i]['name'] + '</button></font>'
+                dp.innerHTML += '<br>' + `<button type="button" class="unstyled-button assignment-button" data-assignmentclass="${class_}"data-assignmentno="${i}" data-toggle="modal" data-target="#assignmentModal"><font size="2">${a[i]['name']} [${a[i]["class"]}]</button></font>`
               }
             })
           }
@@ -37,9 +37,11 @@
               For: ${assignment["class"]}<br>
               Due: ${assignment["deadline"]}<br>
               Description: ${assignment["description"]}<br>
-              Graded: ${assignment["graded"]}<br>
-              URL: <a href="${assignment["url"]}">Link to assignment</a>
-            `
+              Graded: ${assignment["graded"]}<br>`
+              if (assignment["url"] != "N/A")
+              {
+                document .querySelector('.modal-body').innerHTML += `URL: <a href="${assignment["url"]}">Link to assignment</a>`
+              }
           }, 200)
         }
       })

@@ -10,6 +10,15 @@ class Class(models.Model):
     def __str__(self):
         return f"{self.name}, Teacher: {self.teacher.username}"
 
+    def getinfo(self):
+        ans = {
+            "id": self.id,
+            "name": self.name,
+            "teacher": self.teacher,
+        }
+
+        return ans
+
 class Assignment(models.Model):
     Class = models.ForeignKey(Class, on_delete=models.CASCADE)
     name = models.CharField(max_length=256)
