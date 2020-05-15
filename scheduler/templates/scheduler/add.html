@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Add an assignment {% endblock %}
+
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.add').onclick = () => {
+                error = false;
+                if (document.querySelector('.class-select').value === "")
+                {
+                    error = true;
+                    document.querySelector('.class-warn').innerHTML = "Please select a class"
+                }
+                else
+                {
+                    document.querySelector('.class-warn').innerHTML = ""
+                }
+
+                if (document.querySelector('.name').value === "")
+                {
+                    error = true;
+                    document.querySelector('.name-warn').innerHTML = "Please enter an assignment name"
+                }
+                else
+                {
+                    document.querySelector('.name-warn').innerHTML = ""
+                }
+
+                if (document.querySelector('.deadline').value == "" || document.querySelector('.deadline1').value == "")
+                {
+                    error = true;
+                    document.querySelector('.deadline-warn').innerHTML = "Please select a deadline"
+                }
+                else
+                {
+                    document.querySelector('.deadline-warn').innerHTML = ""
+                }
+
+                if (document.querySelector('.url').value == "")
+                {
+                    error = true;
+                    document.querySelector('.url-warn').innerHTML = "Please enter a URL"
+                }
+                else
+                {
+                    document.querySelector('.deadline-warn').innerHTML = ""
+                }
+
+                if (document.querySelector('.description').value === "")
+                {
+                    error = true;
+                    document.querySelector('.description-warn').innerHTML = "Please enter a description"
+                }
+                else
+                {
+                    document.querySelector('.description-warn').innerHTML = ""
+                }
+
+
+                if (error === false)
+                {
+                    result = {
+                        "class": document.querySelector('.class-select').value,
+                        "name": document.querySelector('.name').value,
+                        "deadline": document.querySelector('.deadline').value + " " + document.querySelector('.deadline1').value,
+                        "url": document.querySelector('.url').value,
+                        "description": document.querySelector('.description').value,
+                        "graded": document.querySelector('.graded').checked,
+                        "priority": document.querySelector('.priority').value,
+                    }
+                    
+                    var request = new XMLHttpRequest()
+                    request.open('POST', `/add/`)
+                    request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+                    request.onload = () => {
+                        if (request.responseText === "OK")
+                        {
+                            window.location.href = "/"
+                        }
+                        else
+                        {
+                            alert("Something went wrong on the server-side. Please try again.")
+                        }
+                    }
+                    request.send(JSON.stringify(result))
+                }
+            }
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <link href="{% static 'scheduler/styles.css' %}" rel="stylesheet"/>
+
+    <div class="question-set question-form">
+        <center><h4>Add an assignment</h4></center>
+        <br>
+        <label for="class">Which class</label>
+        <select class="custom-select class-select" name="class-select">
+            <option selected value="">Select an class</option>
+            {% for i in classes %}
+            <option value="{{ i.0 }}">{{ i.1 }}</option>
+            {% endfor %}
+        </select>
+        <p class="text-danger class-warn"></p>
+        <br>
+        <label for="name">Name of assignment</label>
+        <input class="form-control name" id="name" type="text" placeholder="Name of Assignment">
+        <p class="text-danger name-warn"></p>
+        <br>
+        <label for="deadline">Deadline</label>
+        <input type="date" class="deadline" name="deadline" style="width: 100%; height: 34px;">
+        <br><br>
+        <input type="time" class="deadline1" name="deadline1" style="width: 100%; height: 34px;">
+        <p class="text-danger deadline-warn"></p>
+        <br>
+        <label for="url">URL</label>
+        <input class="form-control url" id="url" type="url" placeholder="URL">
+        <p class="text-warning">Please enter 'N/A' if there is no URL</p>
+        <p class="text-danger url-warn"></p>
+        <br>
+        <label for="description">Description</label>
+        <textarea class="form-control description" id="description" rows="3"></textarea>
+        <p class="text-danger description-warn"></p>
+        <br>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input graded" id="customCheck1">
+            <label class="custom-control-label" for="customCheck1">Graded</label>
+        </div>
+        <br>
+        <label class="mt-3" for="customRange3">Priority</label>
+        <input type="range" class="custom-range priority" min="1" max="5" step="1" id="customRange3">
+        <br>
+        <br>
+        <button type="submit" class="btn btn-primary add" style="width: 100%;">Add</button>
+      </div>
+{% endblock %}
