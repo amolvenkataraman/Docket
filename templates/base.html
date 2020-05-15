@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>{% block title %} {% endblock %} | Docket</title>
 
-    <!-- Scripts and stylecheets -->
+    <!-- Scripts and stylesheets -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
 
@@ -45,10 +45,11 @@
               <div class="navbar-collapse collapse w-80 order-3 dual-collapse2">
                   <ul class="nav navbar-nav navbar-right ml-auto">
                       {% if request.user.teacher == True %}
-                      <a href="{% url 'add' %}"><i class="far fa-plus-square" style="margin-top: 10px; margin-right: 10px;"></i></a>
+                      <a href="{% url 'add' %}"><i class="far fa-plus-square" data-toggle="tooltip" data-placement="bottom" title="Add an assignment" style="margin-top: 10px; margin-right: 10px;"></i></a>
                       {% endif %}
                       {% if request.user.is_superuser %}
                         <li class="nav-item" data-toggle="tooltip" data-placement="top" title="Administration"><a href="{% url 'admin:index' %}"><i class="fas fa-users-cog" style="margin-top: 10px; margin-right: 10px;"></i></a></li>
+                        <li class="nav-item" data-toggle="tooltip" data-placement="top" title="Statistics"><a href="{% url 'stats' %}"><i class="fas fa-chart-bar" style="margin-top: 10px; margin-right: 10px;"></i></a></li>
                       {% endif %}
                       {% if user.is_authenticated %}
                         <li class="nav-item">
@@ -79,5 +80,10 @@
     <div id="main-body">
       {% block body %} {% endblock %}
     </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light navbar fixed-bottom" style="margin-bottom: 0px;">
+      <h4>Docket work organizer</h4>&nbsp&nbsp&nbspDemonstration version.&nbsp&nbsp&copy 2020 Amol Venkataraman&nbsp&nbsp&nbsp
+      <a href="https://forms.gle/KysrWCVgyDZDKw7Q9">Report a bug or suggest a feature</a>
+    </nav>
   </body>
 </html>

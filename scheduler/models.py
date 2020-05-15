@@ -14,7 +14,7 @@ class Class(models.Model):
         ans = {
             "id": self.id,
             "name": self.name,
-            "teacher": self.teacher,
+            "teacher": self.teacher.username,
         }
 
         return ans

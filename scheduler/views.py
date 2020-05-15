@@ -1,5 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import *
 
@@ -50,6 +51,21 @@ def enroll(request):
         class_ = Class.objects.filter(id=request.GET.get('class'))[0]
         if class_ in request.user.class_student.all():
             return HttpResponse("You are already enrolled in this class")
-        return render(request, 'scheduler/enroll.html', class_.getinfo())
+        else:
+            return render(request, 'scheduler/enroll.html', class_.getinfo())
     else:
-        #todo
+        class_ = Class.objects.filter(id=request.GET.get('class'))[0]
+        if class_ in request.user.class_student.all():
+            return HttpResponse("You are already enrolled in this class")
+        else:
+            class_.students.add(request.user)
+            messages.success(request, f'Successfully enrolled in {class_.name}.')
+            return redirect('/')
+
+def stats(request):
+    context = {
+        "users": DocketUser.objects.count(),
+        "classes": Class.objects.count(),
+        "assignments": Assignment.objects.count(),
+    }
+    return render(request, 'scheduler/admin.html', context)

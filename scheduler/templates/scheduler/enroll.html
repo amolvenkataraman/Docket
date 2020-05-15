@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Enroll {% endblock %}
+
+{% block body %}
+    <link href="{% static 'scheduler/styles.css' %}" rel="stylesheet"/>
+
+    <div class="question-set question-form">
+        <center><h4>Enroll?</h4></center>
+        <br>
+        <p>Class name: {{ name }}</p>
+        <p>Teacher: {{ teacher }}</p>
+        <br>
+        <form class="enroll" id="form-id" action="{% url 'enroll' %}?class={{ id }}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success" style="width: 100%;">Enroll</button>
+        </form>
+        <br>
+        <a href="{% url 'index' %}"><button type="submit" class="btn btn-danger" style="width: 100%;">Don't Enroll</button></a>
+      </div>
+{% endblock %}

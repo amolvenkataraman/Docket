@@ -37,6 +37,10 @@
   vertical-align: top;
 }
 
+.date-picker {
+  width: 14%;
+}
+
 .date-picker.selected {
   font-weight: bold;
   outline: 1px solid #00BCD4;
