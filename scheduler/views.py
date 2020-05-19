@@ -62,6 +62,30 @@ def enroll(request):
             messages.success(request, f'Successfully enrolled in {class_.name}.')
             return redirect('/')
 
+@login_required(login_url="login/")
+def class_(request):
+    if request.method == 'GET':
+        if request.user.teacher == True:
+            context = {"classes": []}
+            for c in Class.objects.filter(teacher=request.user):
+                context["classes"].append({
+                    "id": c.id,
+                    "name": c.name,
+                    "students": c.students.count(),
+                })
+            return render(request, 'scheduler/class.html', context)
+        else:
+            return HttpResponse("Only teachers are allowed to access this")
+    else:
+        if request.user.teacher == True:
+            c = Class(name=request.body.decode('utf8'))
+            c.teacher = request.user
+            c.save()
+            c.students.add(request.user)
+            return HttpResponse("OK")
+        else:
+            return HttpResponse("Only teachers are allowed to access this")
+
 def stats(request):
     context = {
         "users": DocketUser.objects.count(),

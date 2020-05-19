@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Classes {% endblock %}
+
+{% block script %}
+    <script>
+		document.addEventListener('DOMContentLoaded', () => {
+			document.querySelector('.create').onclick = () => {
+				if (document.querySelector('.name').value === "")
+				{
+					document.querySelector('.name').value = "Please enter a class name"
+				}
+				else
+				{
+					var request = new XMLHttpRequest()
+                    request.open('POST', `/class/`)
+                    request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+                    request.onload = () => {
+                        if (request.responseText === "OK")
+                        {
+                            location.reload()
+                        }
+                        else
+                        {
+                            alert("Something went wrong on the server-side. Please try again.")
+                        }
+					}
+                    request.send(document.querySelector('.name').value)
+				}
+			}
+		})
+    </script>
+{% endblock %}
+
+{% block body %}
+    <link href="{% static 'scheduler/styles.css' %}" rel="stylesheet"/>
+    <table class="table table-striped">
+		<thead>
+			<tr>
+				<th scope="col">No.</th>
+				<th scope="col">Name</th>
+				<th scope="col">Students</th>
+				<th scope="col">Enroll Link</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in classes %}
+				<tr>
+					<th scope="row">{{ loop.index }}</th>
+					<td><button type="submit" class="btn btn-link">{{ row.name }}</button></td>
+					<td><button type="submit" class="btn btn-link">{{ row.students }}</button></td>
+                    <td><a href='{% url "enroll" %}?class={{ row.id }}' target="_blank">Link</a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<br>
+	<center><button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#classModal" style="width: 30%;">Create a class</button></center>
+    <br>
+	<br>
+	
+	<div class="modal fade" id="classModal" tabindex="-1" role="dialog" aria-labelledby="classModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title" id="classModalLabel">Loading...</h5>
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			<div class="modal-body">
+				<label for="name">Name of class</label>
+				<input class="form-control name" id="name" type="text" placeholder="Name of class">
+				<p class="text-danger name-warn"></p>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary create">Create</button>
+			  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+{% endblock %}
