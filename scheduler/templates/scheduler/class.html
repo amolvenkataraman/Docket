@@ -47,7 +47,7 @@
 		<tbody>
 			{% for row in classes %}
 				<tr>
-					<th scope="row">{{ loop.index }}</th>
+					<td>{{ forloop.counter }}</th>
 					<td><button type="submit" class="btn btn-link">{{ row.name }}</button></td>
 					<td><button type="submit" class="btn btn-link">{{ row.students }}</button></td>
                     <td><a href='{% url "enroll" %}?class={{ row.id }}' target="_blank">Link</a></td>

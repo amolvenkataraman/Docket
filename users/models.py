@@ -6,5 +6,6 @@ from django.contrib.auth.models import AbstractUser
 class DocketUser(AbstractUser):
     email = models.EmailField('Email address', unique=True)
     teacher = models.BooleanField(default=False)
+    newuser = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'password']
