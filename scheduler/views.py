@@ -1,8 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import *
+from .vars import *
 
 import datetime
 import json
@@ -10,14 +11,34 @@ import json
 # Create your views here.
 @login_required(login_url="login/")
 def index(request):
-    context = {"assignments": {}}
+    return render(request, 'scheduler/schedule.html', {"vars": VARS})
+
+@login_required(login_url="login/")
+def get_data(request):
+    timespan = request.GET.get("timespan")
+    time = request.GET.get("time")
+    context = {"data": {}}
     classes = request.user.class_student.all()
     for class_ in classes:
-        context["assignments"][class_.name] = []
-        assignments = Assignment.objects.filter(Class=class_)
+        context["data"][class_.name] = {}
+        context["data"][class_.name]["assignments"] = []
+        context["data"][class_.name]["events"] = []
+        if timespan == "month":
+            if time == None:
+                assignments = Assignment.objects.filter(Class=class_, deadline__month=(datetime.datetime.now().month))
+            else:
+                assignments = Assignment.objects.filter(Class=class_, deadline__month=int(time) + 1)
+        elif timespan == "day":
+            if time == None:
+                assignments = Assignment.objects.filter(Class=class_, deadline__date=datetime.datetime.now().date)
+            else:
+                assignments = Assignment.objects.filter(Class=class_, deadline__date=time)
+        events = Event.objects.filter(Class=class_)
         for assignment in assignments:
-            context["assignments"][class_.name].append(assignment.getinfo())
-    return render(request, 'scheduler/schedule.html', context)
+            context["data"][class_.name]["assignments"].append(assignment.getinfo())
+        for event in events:
+            context["data"][class_.name]["events"].append(event.getinfo())
+    return JsonResponse(context)
 
 @login_required(login_url="login/")
 def add(request):

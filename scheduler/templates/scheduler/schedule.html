@@ -4,48 +4,158 @@
 {% block title %} Schedule {% endblock %}
 
 {% block script %}
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Add assignments to calendar
-      assignments = JSON.parse("{{ assignments }}".replace(/&#x27;/g,'"'))
-      Object.keys(assignments).forEach(class_ => {
-        a = assignments[class_]
-        for (i = 0; i < a.length; i++)
-        {
-          d = new Date(a[i]['deadline'])
-          if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
-          {
-            document.querySelectorAll('.date-picker').forEach(dp => {
-              if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
-              {
-                dp.innerHTML += '<br>' + `<button type="button" class="unstyled-button assignment-button" data-assignmentclass="${class_}"data-assignmentno="${i}" data-toggle="modal" data-target="#assignmentModal"><font size="2">${a[i]['name']} [${a[i]["class"]}]</button></font>`
-              }
-            })
-          }
-        }
-      })
+  <script id="calendar-item" type="text/x-handlebars-template">
+    {% verbatim %}
+      <button type="button" class="unstyled-button assignment-button" data-class="{{ class }}" data-no="{{ i }}" data-type = "{{ type }}" data-toggle="modal" data-target="#modal"><font size="2" color="{{ color }}">{{ text }}</button></font>
+    {% endverbatim %}
+  </script>
 
-      // Show information about the assignment on the modal
-      document.querySelectorAll('.assignment-button').forEach(button => {
-        button.onclick = () => {
+  <script id="class" type="text/x-handlebars-template">
+    {% verbatim %}
+      
+    {% endverbatim %}
+  </script>
+
+  <script>
+    const calendar_item = Handlebars.compile(document.querySelector("#calendar-item").innerHTML)
+    const d_ = new Date()
+    var m = d_.getMonth()
+    var data
+
+    document.addEventListener('DOMContentLoaded', () => {
+      vars = JSON.parse("{{ vars }}".replace(/&#x27;/g,'"'))
+
+      document.querySelectorAll('.date-span').forEach(ds => {
+        if (vars["holidays"].includes(parseInt(ds.parentElement.dataset.day))) {
+          ds.style.color = "red"
+        }
+        ds.onclick = () => {
           setTimeout(function() {
-            assignment = assignments[button.dataset.assignmentclass][button.dataset.assignmentno]
-            console.log(assignment)
-            document.querySelector('.modal-title').innerHTML = assignment["name"]
-            document .querySelector('.modal-body').innerHTML = ""
-            document .querySelector('.modal-body').innerHTML = `
-              For: ${assignment["class"]}<br>
-              Due: ${assignment["deadline"]}<br>
-              Description: ${assignment["description"]}<br>
-              Graded: ${assignment["graded"]}<br>`
-              if (assignment["url"] != "N/A")
-              {
-                document .querySelector('.modal-body').innerHTML += `URL: <a href="${assignment["url"]}" target="_blank">Link to assignment</a>`
-              }
+            document.querySelector('.modal-title').innerHTML = ds.innerHTML + " " + months[m]
+            console.log(data)
           }, 200)
         }
       })
+
+      populate_calendar(m)
+
+      set_day()
+
+      change_height()
+      window.addEventListener('resize', change_height)
     })
+
+    function change_height() {
+      document.querySelector('.sidebar').style.height = (window.innerHeight - 104).toString() + "px"
+
+      document.querySelector('.wrapper').style.height = (window.innerHeight - 104).toString() + "px"
+      document.querySelectorAll('.date-picker').forEach(dp => {
+        //dp.style.height = ((window.innerHeight - 104 - (document.querySelector('.container-calendar').style.height - document.querySelector('.table-calendar').style.height)) / 10).toString() + "px"
+      })
+    }
+
+    function set_day() {
+      console.log("lol")
+    }
+
+    function populate_calendar(time) {
+      // Add assignments to calendar
+
+      r = new XMLHttpRequest()
+      r.open("GET", "{% url 'data' %}?timespan=month&time=" + time)
+      r.onload = () => {
+        data = JSON.parse(r.responseText.replace(/&#x27;/g,'"'))["data"]
+        console.log(data)
+
+        document.querySelector('.classlist').innerHTML = ""
+        Object.keys(data).forEach(class_ => {
+          document.querySelector('.classlist').innerHTML += '<br>' + '<button type="button" class="btn btn-link">' + class_ + '</button>'
+
+          a = data[class_]["assignments"]
+          for (i = 0; i < a.length; i++)
+          {
+            d = new Date(a[i]['deadline'])
+            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
+            {
+              document.querySelectorAll('.date-picker').forEach(dp => {
+                if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
+                {
+                  dp.innerHTML += '<br>'
+                  var ci = calendar_item({'class': class_, 'i': i, 'type': "assignment", 'color': "black", 'text': a[i]['name'] + " [" + a[i]['class'] + "]"})
+                  dp.innerHTML += ci
+                }
+              })
+            }
+          }
+
+          e = data[class_]["events"]
+          for (i = 0; i < e.length; i++)
+          {
+            d = new Date(e[i]['startdate'])
+            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
+            {
+              document.querySelectorAll('.date-picker').forEach(dp => {
+                if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
+                {
+                  dp.innerHTML += '<br>'
+                  var ci = calendar_item({'class': class_, 'i': i, 'type': "event", 'color': "cornflowerblue", 'text': e[i]['name']})
+                  dp.innerHTML += ci
+                  if (e[i]['holiday'] == true) {
+                    dp.querySelector('span').style.color = "red"
+                  }
+                }
+              })
+            }
+          }
+        })
+
+        // Show information about the assignment on the modal
+        document.querySelectorAll('.assignment-button').forEach(button => {
+          button.onclick = () => {
+            setTimeout(function() {
+              if (button.dataset.type == "assignment") {
+                assignment = data[button.dataset.class]["assignments"][button.dataset.no]
+                document.querySelector('.modal-title').innerHTML = assignment["name"]
+                document .querySelector('.modal-body').innerHTML = ""
+                document .querySelector('.modal-body').innerHTML = `
+                  For: ${assignment["class"]}<br>
+                  Due: ${assignment["deadline"]}<br>
+                  Description: ${assignment["description"]}<br>
+                  Graded: ${assignment["graded"]}<br>`
+                  if (assignment["url"] != "N/A")
+                  {
+                    document .querySelector('.modal-body').innerHTML += `URL: <a href="${assignment["url"]}" target="_blank">Link to assignment</a>`
+                  }
+              }
+              else {
+                event = data[button.dataset.class]["events"][button.dataset.no]
+                document.querySelector('.modal-title').innerHTML = event["name"]
+                document .querySelector('.modal-body').innerHTML = ""
+                document .querySelector('.modal-body').innerHTML = `
+                  For: ${event["class"]}<br>
+                  Start Date: ${event["startdate"]}<br>
+                  End Date: ${event["enddate"]}<br>
+                  Description: ${event["description"]}<br>`
+              }
+              console.log("LOL")
+            }, 200)
+          }
+        })
+      }
+      r.send()
+    }
+
+    function go_prev() {
+      m -= 1
+      previous()
+      populate_calendar(m)
+    }
+
+    function go_next() {
+      m += 1
+      next()
+      populate_calendar(m)
+    }
   </script>
 {% endblock %}
 
@@ -53,37 +163,48 @@
   <link href="{% static 'scheduler/styles.css' %}" rel="stylesheet"/>
   <link href="{% static 'scheduler/calendar.css' %}" rel="stylesheet"/>
 
-  <div class="wrapper">
-    <div class="container-calendar">
-        <h3 id="monthAndYear"></h3>
-        <div class="button-container-calendar">
-            <button id="previous" onclick="previous()">&#8249;</button>
-            <button id="next" onclick="next()">&#8250;</button>
+  <div class="main-container">
+    <div class="sidebar jumbotron">
+      <div>
+        <font size=4>Enrolled:</font>
+        <div class="classlist">
+
         </div>
-        
-        <table class="table-calendar" id="calendar" data-lang="en">
-            <thead id="thead-month"></thead>
-            <tbody id="calendar-body"></tbody>
-        </table>
-        
-        <div class="footer-container-calendar">
-            <label for="month">Jump To: </label>
-            <select id="month" onchange="jump()">
-                <option value=0>Jan</option>
-                <option value=1>Feb</option>
-                <option value=2>Mar</option>
-                <option value=3>Apr</option>
-                <option value=4>May</option>
-                <option value=5>Jun</option>
-                <option value=6>Jul</option>
-                <option value=7>Aug</option>
-                <option value=8>Sep</option>
-                <option value=9>Oct</option>
-                <option value=10>Nov</option>
-                <option value=11>Dec</option>
-            </select>
-            <select id="year" onchange="jump()"></select>       
-        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+      <div class="container-calendar">
+          <h3 id="monthAndYear"></h3>
+          <div class="button-container-calendar">
+              <button id="previous" onclick="go_prev()">&#8249;</button>
+              <button id="next" onclick="go_next()">&#8250;</button>
+          </div>
+          
+          <table class="table-calendar" id="calendar" data-lang="en">
+              <thead id="thead-month"></thead>
+              <tbody id="calendar-body"></tbody>
+          </table>
+          
+          <div class="footer-container-calendar">
+              <label for="month">Jump To: </label>
+              <select id="month" onchange="jump()">
+                  <option value=0>Jan</option>
+                  <option value=1>Feb</option>
+                  <option value=2>Mar</option>
+                  <option value=3>Apr</option>
+                  <option value=4>May</option>
+                  <option value=5>Jun</option>
+                  <option value=6>Jul</option>
+                  <option value=7>Aug</option>
+                  <option value=8>Sep</option>
+                  <option value=9>Oct</option>
+                  <option value=10>Nov</option>
+                  <option value=11>Dec</option>
+              </select>
+              <select id="year" onchange="jump()"></select>       
+          </div>
+      </div>
     </div>
   </div>
 <!--
@@ -100,11 +221,11 @@
         (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
   </center>-->
-  <div class="modal fade" id="assignmentModal" tabindex="-1" role="dialog" aria-labelledby="assignmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+  <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="assignmentModalLabel">Loading...</h5>
+          <h5 class="modal-title" id="modalLabel">Loading...</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

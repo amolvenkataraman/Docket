@@ -91,8 +91,9 @@ function showCalendar(month, year) {
               cell.setAttribute("data-month", month + 1);
               cell.setAttribute("data-year", year);
               cell.setAttribute("data-month_name", months[month]);
+              cell.setAttribute("data-day", j);
               cell.className = "date-picker";
-              cell.innerHTML = "<span>" + date + "</span>"
+              cell.innerHTML = "<span class='date-span'data-toggle='modal' data-target='#modal'>" + date + "</span>"
 
               if ( date === today.getDate() && year === today.getFullYear() && month === today.getMonth() ) {
                   cell.className = "date-picker selected";

@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import UserRegisterForm
+from .models import *
+from scheduler.models import *
 
 # Views for login and logout
 
@@ -14,6 +16,10 @@ def register_view(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
+            user = DocketUser.objects.filter(username=username)
+            default_classes = Class.objects.filter(default=True)
+            for c in default_classes:
+                c.students.add(user)
             messages.success(request, f'Account created for \'{username}\'. Please log in now')
             return redirect('login')
     else:

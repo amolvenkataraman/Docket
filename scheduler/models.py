@@ -6,6 +6,8 @@ class Class(models.Model):
     name = models.CharField(max_length=64)
     teacher = models.ForeignKey(DocketUser, on_delete=models.SET("DELETED_USER"), related_name='class_teacher')
     students = models.ManyToManyField(DocketUser, related_name='class_student')
+    default = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name}, Teacher: {self.teacher.username}"
@@ -41,5 +43,30 @@ class Assignment(models.Model):
             "description": self.description,
             "graded": str(self.graded),
             "priority": self.priority,
+        }
+        return ans
+
+class Event(models.Model):
+    Class = models.ForeignKey(Class, on_delete=models.CASCADE)
+    name = models.CharField(max_length=256)
+    startdate = models.DateTimeField(auto_now=False)
+    enddate = models.DateTimeField(auto_now=False)
+    description = models.TextField()
+    specialschedule = models.BooleanField(default=False)
+    holiday = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name} for {self.Class.name}. From {str(self.startdate)} to {str(self.enddate)}"
+
+    def getinfo(self):
+        ans = {
+            "id": self.id,
+            "class": self.Class.name,
+            "name": self.name,
+            "startdate": str(self.startdate),
+            "enddate": str(self.enddate),
+            "description": self.description,
+            "specialschedule": self.specialschedule,
+            "holiday": self.holiday,
         }
         return ans

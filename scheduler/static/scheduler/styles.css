@@ -1,3 +1,9 @@
+.main-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .unstyled-button {
   border: none;
   padding: 0;
@@ -63,4 +69,12 @@
 .info h4 {
     margin: 0 0 5px;
     color: #777;
+}
+
+.sidebar {
+  width: 15%;
+  height: 100%;
+  margin: 0px;
+  padding: 10px;
+  background: #f8f9fa;
 }
