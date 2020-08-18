@@ -68,46 +68,48 @@
         console.log(data)
 
         document.querySelector('.classlist').innerHTML = ""
-        Object.keys(data).forEach(class_ => {
-          document.querySelector('.classlist').innerHTML += '<br>' + '<button type="button" class="btn btn-link">' + class_ + '</button>'
 
-          a = data[class_]["assignments"]
-          for (i = 0; i < a.length; i++)
-          {
-            d = new Date(a[i]['deadline'])
-            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
-            {
-              document.querySelectorAll('.date-picker').forEach(dp => {
-                if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
-                {
-                  dp.innerHTML += '<br>'
-                  var ci = calendar_item({'class': class_, 'i': i, 'type': "assignment", 'color': "black", 'text': a[i]['name'] + " [" + a[i]['class'] + "]"})
-                  dp.innerHTML += ci
-                }
-              })
-            }
-          }
+        c = data["class"]
+        for (i = 0; i < c.length; i++) {
+          document.querySelector('.classlist').innerHTML += '<br>' + '<button type="button" class="btn btn-link">' + c[i]["name"] + '</button>'
+        }
 
-          e = data[class_]["events"]
-          for (i = 0; i < e.length; i++)
+        a = data["assignments"]
+        for (i = 0; i < a.length; i++)
+        {
+          d = new Date(a[i]['deadline'])
+          if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
           {
-            d = new Date(e[i]['startdate'])
-            if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
-            {
-              document.querySelectorAll('.date-picker').forEach(dp => {
-                if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
-                {
-                  dp.innerHTML += '<br>'
-                  var ci = calendar_item({'class': class_, 'i': i, 'type': "event", 'color': "cornflowerblue", 'text': e[i]['name']})
-                  dp.innerHTML += ci
-                  if (e[i]['holiday'] == true) {
-                    dp.querySelector('span').style.color = "red"
-                  }
-                }
-              })
-            }
+            document.querySelectorAll('.date-picker').forEach(dp => {
+              if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
+              {
+                dp.innerHTML += '<br>'
+                var ci = calendar_item({'class': a[i]['class'], 'i': i, 'type': "assignment", 'color': "black", 'text': a[i]['name'] + " [" + a[i]['class'] + "]"})
+                dp.innerHTML += ci
+              }
+            })
           }
-        })
+        }
+
+        e = data["events"]
+        for (i = 0; i < e.length; i++)
+        {
+          d = new Date(e[i]['startdate'])
+          if (d.getFullYear() === currentYear && d.getMonth() === currentMonth)
+          {
+            document.querySelectorAll('.date-picker').forEach(dp => {
+              if (dp.dataset.year == d.getFullYear() && dp.dataset.month == d.getMonth() + 1 && dp.dataset.date == d.getDate())
+              {
+                dp.innerHTML += '<br>'
+                var ci = calendar_item({'class': e[i]['class'], 'i': i, 'type': "event", 'color': "cornflowerblue", 'text': e[i]['name']})
+                dp.innerHTML += ci
+                if (e[i]['holiday'] == true) {
+                  dp.querySelector('span').style.color = "red"
+                }
+              }
+            })
+          }
+        }
 
         // Show information about the assignment on the modal
         document.querySelectorAll('.assignment-button').forEach(button => {
