@@ -3,10 +3,12 @@ from users.models import DocketUser
 
 # Create your models here.
 class Class(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, unique=True)
     teacher = models.ForeignKey(DocketUser, on_delete=models.SET("DELETED_USER"), related_name='class_teacher')
     students = models.ManyToManyField(DocketUser, related_name='class_student')
-    default = models.BooleanField(default=False)
+    #room = "LOL"
+    scheduled_class = models.BooleanField(default=False)
+    org_class = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -17,8 +19,33 @@ class Class(models.Model):
             "id": self.id,
             "name": self.name,
             "teacher": self.teacher.username,
+            "scheduled_class": self.scheduled_class,
+            "org_class": self.org_class,
+            "active": self.active,
         }
 
+        return ans
+
+class Group(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+    classes = models.ManyToManyField(Class, related_name='group_class')
+
+    def __str__(self):
+        return f"{self.name}"
+
+class Invite(models.Model):
+    Class = models.ForeignKey(Class, on_delete=models.CASCADE)
+    code = models.CharField(max_length=8)
+
+    def __str__(self):
+        return f"{self.code}, for {self.Class.name}"
+
+    def getinfo(self):
+        ans = {
+            "id": self.id,
+            "class": self.Class.getinfo(),
+            "code": self.code,
+        }
         return ans
 
 class Assignment(models.Model):
@@ -36,7 +63,7 @@ class Assignment(models.Model):
     def getinfo(self):
         ans = {
             "id": self.id,
-            "class": self.Class.name,
+            "class": self.Class.getinfo(),
             "name": self.name,
             "deadline": str(self.deadline),
             "url": self.url,
@@ -61,7 +88,7 @@ class Event(models.Model):
     def getinfo(self):
         ans = {
             "id": self.id,
-            "class": self.Class.name,
+            "class": self.Class.getinfo(),
             "name": self.name,
             "startdate": str(self.startdate),
             "enddate": str(self.enddate),

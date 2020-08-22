@@ -57,6 +57,10 @@
   border-bottom: 2px solid currentColor;
 }
 
+.date-span {
+  cursor: pointer;
+}
+
 /*
 .date-picker:nth-child(1) {
 color: red;

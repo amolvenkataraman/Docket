@@ -41,7 +41,7 @@
 				<th scope="col">No.</th>
 				<th scope="col">Name</th>
 				<th scope="col">Students</th>
-				<th scope="col">Enroll Link</th>
+				<!--<th scope="col">Enroll Link</th>-->
 			</tr>
 		</thead>
 		<tbody>
@@ -49,8 +49,8 @@
 				<tr>
 					<td>{{ forloop.counter }}</th>
 					<td><button type="submit" class="btn btn-link">{{ row.name }}</button></td>
-					<td><button type="submit" class="btn btn-link">{{ row.students }}</button></td>
-                    <td><a href='{% url "enroll" %}?class={{ row.id }}' target="_blank">Link</a></td>
+					<td><button type="submit" class="btn btn-link">{{ row.students | length }}</button></td>
+                    <!--<td><a href='{% url "enroll" %}?class={{ row.id }}' target="_blank">Link</a></td>-->
 				</tr>
 			{% endfor %}
 		</tbody>
@@ -64,7 +64,7 @@
 		<div class="modal-dialog" role="document">
 		  <div class="modal-content">
 			<div class="modal-header">
-			  <h5 class="modal-title" id="classModalLabel">Loading...</h5>
+			  <h5 class="modal-title" id="classModalLabel">Create a Class</h5>
 			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			  </button>
@@ -73,6 +73,14 @@
 				<label for="name">Name of class</label>
 				<input class="form-control name" id="name" type="text" placeholder="Name of class">
 				<p class="text-danger name-warn"></p>
+
+				<div class="custom-control custom-checkbox scheduledclass">
+					<input type="checkbox" class="custom-control-input scheduledclass-cb" id="customCheck1">
+					<label class="custom-control-label" for="customCheck1">This class is scheduled (It can be added to a student timetable)</label>
+				</div>
+
+				<br>
+				<strong><p class="text-warning">WARNING: Please create a unique class for EACH SECTION you teach. Classes once created can only be deleted by an administrator.</p></strong>
 			</div>
 			<div class="modal-footer">
 			  <button type="button" class="btn btn-primary create">Create</button>

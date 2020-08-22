@@ -3,5 +3,7 @@ from .models import *
 
 # Register your models here.
 admin.site.register(Class)
+admin.site.register(Group)
+admin.site.register(Invite)
 admin.site.register(Assignment)
 admin.site.register(Event)

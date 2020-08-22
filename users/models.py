@@ -9,3 +9,17 @@ class DocketUser(AbstractUser):
     newuser = models.BooleanField(default=True)
 
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'password']
+
+    def __str__(self):
+        return f"{self.username}"
+
+    def getinfo(self):
+        ans = {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "teacher": self.teacher,
+            "newuser": self.newuser,
+        }
+
+        return ans

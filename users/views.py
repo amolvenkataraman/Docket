@@ -17,7 +17,7 @@ def register_view(request):
             form.save()
             username = form.cleaned_data.get('username')
             user = DocketUser.objects.filter(username=username)
-            default_classes = Class.objects.filter(default=True)
+            default_classes = Class.objects.filter(org_class=True)
             for c in default_classes:
                 c.students.add(user)
             messages.success(request, f'Account created for \'{username}\'. Please log in now')

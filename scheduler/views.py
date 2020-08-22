@@ -16,6 +16,8 @@ def index(request):
 @login_required(login_url="login/")
 def get_data(request):
     timespan = request.GET.get("timespan")
+    if timespan == None:
+        return HttpResponse("Timespan not provided")
     time = request.GET.get("time")
     context = {"data": {}}
     classes = request.user.class_student.all()
@@ -48,10 +50,9 @@ def add(request):
             context = {"classes": []}
             classes = Class.objects.filter(teacher=request.user)
             for class_ in classes:
-                context['classes'].append([class_.id, class_.name])
+                context['classes'].append(class_.getinfo())
             return render(request, 'scheduler/add.html', context)
         else:
-            print(request.body)
             req = json.loads(request.body)
             assignment = Assignment(
                 Class=Class.objects.filter(id=req["class"])[0],
@@ -69,6 +70,31 @@ def add(request):
 
 @login_required(login_url="login/")
 def enroll(request):
+    invitecode = request.GET.get("code")
+    if invitecode == None:
+        return JsonResponse({"status": "error", "data": "No Invite Code provided"})
+    invite = Invite.objects.filter(code=invitecode)
+    if request.method == 'GET':
+        try:
+            class_ = invite[0].Class
+            if class_ in request.user.class_student.all():
+                return JsonResponse({"status": "error", "data": "You are already enrolled in this class"})
+            else:
+                return JsonResponse({"status": "success", "data": class_.getinfo()})
+        except IndexError:
+            return JsonResponse({"status": "error", "data": "Invalid Invite Code"})
+    else:
+        try:
+            class_ = invite[0].Class
+            if class_ in request.user.class_student.all():
+                return JsonResponse({"status": "error", "data": "You are already enrolled in this class"})
+            else:
+                class_.students.add(request.user)
+                return JsonResponse({"status": "success"})
+        except IndexError:
+            return JsonResponse({"status": "error", "data": "Invalid Invite Code"})
+
+"""
     if request.method == 'GET':
         class_ = Class.objects.filter(id=request.GET.get('class'))[0]
         if class_ in request.user.class_student.all():
@@ -83,6 +109,7 @@ def enroll(request):
             class_.students.add(request.user)
             messages.success(request, f'Successfully enrolled in {class_.name}.')
             return redirect('/')
+"""
 
 @login_required(login_url="login/")
 def class_(request):
@@ -90,11 +117,9 @@ def class_(request):
         if request.user.teacher == True:
             context = {"classes": []}
             for c in Class.objects.filter(teacher=request.user):
-                context["classes"].append({
-                    "id": c.id,
-                    "name": c.name,
-                    "students": c.students.count(),
-                })
+                temp = c.getinfo()
+                temp['students'] = [i.getinfo() for i in c.students.all()]
+                context["classes"].append(temp)
             return render(request, 'scheduler/class.html', context)
         else:
             return HttpResponse("Only teachers are allowed to access this")
