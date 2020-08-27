@@ -8,7 +8,6 @@ class Class(models.Model):
     students = models.ManyToManyField(DocketUser, related_name='class_student')
     #room = "LOL"
     scheduled_class = models.BooleanField(default=False)
-    org_class = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -20,7 +19,6 @@ class Class(models.Model):
             "name": self.name,
             "teacher": self.teacher.username,
             "scheduled_class": self.scheduled_class,
-            "org_class": self.org_class,
             "active": self.active,
         }
 
@@ -79,8 +77,6 @@ class Event(models.Model):
     startdate = models.DateTimeField(auto_now=False)
     enddate = models.DateTimeField(auto_now=False)
     description = models.TextField()
-    specialschedule = models.BooleanField(default=False)
-    holiday = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} for {self.Class.name}. From {str(self.startdate)} to {str(self.enddate)}"
@@ -89,6 +85,27 @@ class Event(models.Model):
         ans = {
             "id": self.id,
             "class": self.Class.getinfo(),
+            "name": self.name,
+            "startdate": str(self.startdate),
+            "enddate": str(self.enddate),
+            "description": self.description,
+        }
+        return ans
+
+class Org_Event(models.Model):
+    name = models.CharField(max_length=256)
+    startdate = models.DateTimeField(auto_now=False)
+    enddate = models.DateTimeField(auto_now=False)
+    description = models.TextField()
+    specialschedule = models.BooleanField(default=False)
+    holiday = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.name}. From {str(self.startdate)} to {str(self.enddate)}"
+
+    def getinfo(self):
+        ans = {
+            "id": self.id,
             "name": self.name,
             "startdate": str(self.startdate),
             "enddate": str(self.enddate),

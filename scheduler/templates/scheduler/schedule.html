@@ -10,14 +10,26 @@
     {% endverbatim %}
   </script>
 
-  <script id="class" type="text/x-handlebars-template">
-    {% verbatim %}
-      
-    {% endverbatim %}
+  <script id="class-name" type="text/x-handlebars-template">
+    <div class="dropdown">
+      <button class="btn btn-link dropdown-toggle"
+              type="button" id="dropdownMenu1" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              {% verbatim %}{{ name }}{% endverbatim %}
+      </button>
+      {% if request.user.teacher %}
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <a class="dropdown-item" href="#!">Class Info</a>
+          <a class="dropdown-item" href="#!">Create Assignment</a>
+        </div>
+      {% endif %}
+    </div>
   </script>
 
   <script>
     const calendar_item = Handlebars.compile(document.querySelector("#calendar-item").innerHTML)
+    const class_name = Handlebars.compile(document.querySelector("#class-name").innerHTML)
+
     const d_ = new Date()
     var m = d_.getMonth()
     var data
@@ -176,7 +188,7 @@
 
         c = data["class"]
         for (i = 0; i < c.length; i++) {
-          document.querySelector('.classlist').innerHTML += '<button type="button" class="btn btn-link">' + c[i]["name"] + '</button>' + '<br>'
+          document.querySelector('.classlist').innerHTML += class_name({"name": c[i]["name"]})
         }
 
         e = data["events"]
@@ -191,7 +203,23 @@
               dp.innerHTML += '<br>'
               var ci = calendar_item({'class': e[i]['class'], 'i': i, 'type': "event", 'color': "cornflowerblue", 'text': e[i]['name']})
               dp.innerHTML += ci
-              if (e[i]['holiday'] == true) {
+            }
+          })
+        }
+
+        oe = data["org_events"]
+        for (i = 0; i < oe.length; i++)
+        {
+          sd = new Date(oe[i]['startdate'])
+          ed = new Date(oe[i]['startdate'])
+          document.querySelectorAll('.date-picker').forEach(dp => {
+            td = new Date(dp.dataset.year, dp.dataset.month - 1, dp.dataset.date)
+            if (sd.toDateString() <= td.toDateString() && td.toDateString() <= ed.toDateString())
+            {
+              dp.innerHTML += '<br>'
+              var ci = calendar_item({'class': oe[i]['class'], 'i': i, 'type': "org_event", 'color': "green", 'text': oe[i]['name']})
+              dp.innerHTML += ci
+              if (oe[i]['holiday'] == true) {
                 dp.querySelector('span').style.color = "red"
               }
             }
@@ -233,12 +261,22 @@
                     document .querySelector('.modal-body').innerHTML += `URL: <a href="${assignment["url"]}" target="_blank">Link to assignment</a>`
                   }
               }
-              else {
+              else if (button.dataset.type == "event") {
                 event = data["events"][button.dataset.no]
                 document.querySelector('.modal-title').innerHTML = event["name"]
                 document .querySelector('.modal-body').innerHTML = ""
                 document .querySelector('.modal-body').innerHTML = `
                   For: ${event["class"]['name']}<br>
+                  Start Date: ${event["startdate"]}<br>
+                  End Date: ${event["enddate"]}<br>
+                  Description: ${event["description"]}<br>`
+              }
+
+              else if (button.dataset.type == "org_event") {
+                event = data["org_events"][button.dataset.no]
+                document.querySelector('.modal-title').innerHTML = event["name"]
+                document .querySelector('.modal-body').innerHTML = ""
+                document .querySelector('.modal-body').innerHTML = `
                   Start Date: ${event["startdate"]}<br>
                   End Date: ${event["enddate"]}<br>
                   Description: ${event["description"]}<br>`
@@ -279,7 +317,13 @@
   <div class="main-container">
     <div class="sidebar jumbotron">
       <div>
-        <font size=4>Enrolled:</font>
+        <font size=4>
+          {% if request.user.teacher %}
+            Enrolled / Teaching:
+          {% else %}
+            Enrolled:
+          {% endif %}
+        </font>
         <div class="classlist">
 
         </div>

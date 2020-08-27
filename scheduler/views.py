@@ -24,6 +24,7 @@ def get_data(request):
     context["data"]["class"] = []
     context["data"]["assignments"] = []
     context["data"]["events"] = []
+    context["data"]["org_events"] = []
     for class_ in classes:
         context["data"]["class"].append(class_.getinfo())
         if timespan == "month":
@@ -37,10 +38,13 @@ def get_data(request):
             else:
                 assignments = Assignment.objects.filter(Class=class_, deadline__date=time)
         events = Event.objects.filter(Class=class_)
+        org_events = Org_Event.objects.filter()
         for assignment in assignments:
             context["data"]["assignments"].append(assignment.getinfo())
         for event in events:
             context["data"]["events"].append(event.getinfo())
+        for org_event in org_events:
+            context["data"]["org_events"].append(org_event.getinfo())
     return JsonResponse(context)
 
 @login_required(login_url="login/")
