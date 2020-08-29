@@ -2,12 +2,62 @@ from django.db import models
 from users.models import DocketUser
 
 # Create your models here.
+class Day(models.Model):
+    day = models.SmallIntegerField(null=False)
+
+    def __str__(self):
+        return f"Day {self.day}"
+    
+    def getinfo(self):
+        ans = {
+            "id": self.id,
+            "day": self.day,
+        }
+        return ans
+
+class Slot(models.Model):
+    period_no = models.SmallIntegerField(null=False)
+    name = models.CharField(max_length=64)
+    start = models.TimeField(auto_now=False, null=False)
+    end = models.TimeField(auto_now=False, null=False)
+    
+    def __str__(self):
+        return f"{self.name} (Period {self.period_no}). From {str(self.start)} to {str(self.end)}"
+    
+    def getinfo(self):
+        ans = {
+            "id": self.id,
+            "period_no": self.period_no,
+            "name": self.name,
+            "start": str(self.start.strftime("%H:%M")),
+            "end": str(self.end.strftime("%H:%M")),
+        }
+        return ans
+
+class Period(models.Model):
+    day = models.ForeignKey(Day, on_delete=models.PROTECT, related_name='slot_day')
+    period = models.ForeignKey(Slot, on_delete=models.PROTECT, related_name='slot_period')
+
+    def __str__(self):
+        return f"{self.period.name} on Day {self.day.day}"
+
+    def getinfo(self):
+        ans = {
+            "id": self.id,
+            "day": self.day.getinfo(),
+            "period": self.period.getinfo(),
+        }
+        return ans
+
+
+
 class Class(models.Model):
     name = models.CharField(max_length=64, unique=True)
     teacher = models.ForeignKey(DocketUser, on_delete=models.SET("DELETED_USER"), related_name='class_teacher')
     students = models.ManyToManyField(DocketUser, related_name='class_student')
     #room = "LOL"
     scheduled_class = models.BooleanField(default=False)
+    period = models.ManyToManyField(Period, related_name='class_period')
     active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -19,8 +69,12 @@ class Class(models.Model):
             "name": self.name,
             "teacher": self.teacher.username,
             "scheduled_class": self.scheduled_class,
+            "period": [],
             "active": self.active,
         }
+
+        for i in self.period.all():
+            ans["period"].append(i.getinfo())
 
         return ans
 
@@ -45,6 +99,8 @@ class Invite(models.Model):
             "code": self.code,
         }
         return ans
+
+
 
 class Assignment(models.Model):
     Class = models.ForeignKey(Class, on_delete=models.CASCADE)

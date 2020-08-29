@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Enroll {% endblock %}
+
+{% block script %}
+{% endblock %}
+
+{% block body %}
+    <link href="{% static 'scheduler/styles.css' %}" rel="stylesheet"/>
+    <table class="table table-striped">
+		<thead>
+			<tr>
+                <th></th>
+                {% for i in days %}
+                    <th>{{ i.day }}</th>
+                {% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+            {% for i in slots %}
+                <tr>
+                    <td>{{ i.name }} ({{ i.start }} - {{ i.end }})</td>
+                    {% for i in days %}
+                        <td></td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+		</tbody>
+{% endblock %}

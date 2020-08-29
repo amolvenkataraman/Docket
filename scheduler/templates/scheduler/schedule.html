@@ -47,6 +47,7 @@
 
       populate_calendar(m)
 
+      timetable()
       enroll()
 
       window.addEventListener('resize', change_height)
@@ -61,6 +62,69 @@
       //document.querySelector('#calendar-body').querySelectorAll('tr').forEach(dp => {
       //  dp.style.height = dph.toString() + "px"
       //})
+    }
+
+    function printDiv(elementId) {
+      data = document.getElementById(elementId).innerHTML;
+      window.frames["print_frame"].document.title = document.title;
+      window.frames["print_frame"].document.body.innerHTML = `<style>
+        .timetable{font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;width: 100%;border-collapse: separate;border-spacing: 3px;}
+        .timetable td, .timetable th {border: 1px solid #ddd;padding: 8px;margin: 8px;}
+        .timetable tr:nth-child(even){background-color: #f2f2f2;}
+        .timetable th:nth-child(1){max-width: 30px;}
+        .timetable td:nth-child(1){max-width: 30px;}
+        .timetable th {padding-top: 12px;padding-bottom: 12px;text-align: left;}
+      </style>` + data;
+      window.frames["print_frame"].window.focus();
+      window.frames["print_frame"].window.print();
+    }
+
+    function timetable() {
+      document.querySelector('.timetable-btn').onclick = () => {
+        setTimeout(function() {
+          document.querySelector('.big-modal-title').innerHTML = "Student Timetable"
+          document.querySelector('.big-modal-body').innerHTML = `
+            <div id="timetable-printable">
+              <table class="timetable">
+                <thead class="timetable-head">
+                  <tr class="timetable-head-row"></tr>
+                </thead>
+                <tbody class="timetable-body">
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-link" onclick="printDiv('timetable-printable')">
+              Print Timetable
+            </button>
+          `
+
+          document.querySelector('.timetable-head-row').innerHTML += "<th>Period</th>"
+          for (i = 0; i < data["days"].length; i++) {
+            document.querySelector('.timetable-head-row').innerHTML += "<th>Day " + data["days"][i]["day"] + "</th>"
+          }
+
+          for (i = 0; i < data["slots"].length; i++) {
+            document.querySelector('.timetable-body').innerHTML += `<tr class="timetable-row timetable-row-${i}"></tr>`
+            currRow = document.querySelector(`.timetable-row-${i}`)
+            currRow.innerHTML += `<td>${data["slots"][i]["name"]}<br>${data["slots"][i]["start"]} - ${data["slots"][i]["end"]}</td>`
+
+            for (j = 0; j < data["days"].length; j++) {
+              currRow.innerHTML += `<td class=schedule-data-${j}></td>`
+              currData = currRow.querySelector(`.schedule-data-${j}`)
+
+              for (k = 0; k < data["class"].length; k++) {
+                for (l = 0; l < data["class"][k]["period"].length; l++) {
+                  temp = data["class"][k]["period"][l]
+                  
+                  if (temp["day"]["id"] === data["days"][j]["id"] && temp["period"]["id"] === data["slots"][i]["id"]) {
+                    currData.innerHTML = `${data["class"][k]["name"]}<br>${data["class"][k]["teacher"]}`
+                  }
+                }
+              }
+            }
+          }
+        }, 100)
+      }
     }
 
     function enroll() {
@@ -183,6 +247,7 @@
       r.open("GET", "{% url 'data' %}?timespan=month&time=" + time)
       r.onload = () => {
         data = JSON.parse(r.responseText.replace(/&#x27;/g,'"'))["data"]
+        console.log(data)
 
         document.querySelector('.classlist').innerHTML = ""
 
@@ -311,8 +376,8 @@
 {% endblock %}
 
 {% block body %}
-  <link href="{% static 'scheduler/styles.css' %}" rel="stylesheet"/>
-  <link href="{% static 'scheduler/calendar.css' %}" rel="stylesheet"/>
+  <link href="{% static 'scheduler/styles.css' %}" rel="stylesheet" media="all"/>
+  <link href="{% static 'scheduler/calendar.css' %}" rel="stylesheet" media="all"/>
 
   <div class="main-container">
     <div class="sidebar jumbotron">
@@ -327,7 +392,8 @@
         <div class="classlist">
 
         </div>
-        <button type="button" class="btn btn-info enroll-btn" data-toggle="modal" data-target="#modal">+</button>
+        <button type="button" class="btn btn-info enroll-btn" data-toggle="modal" data-target="#modal"><i class="far fa-plus-square"></i></button>
+        <button type="button" class="btn btn-info timetable-btn" data-toggle="modal" data-target="#big-modal"><i class="far fa-calendar-alt"></i></button>
       </div>
     </div>
 
@@ -398,20 +464,25 @@
     </div>
   </div>
 
-  <!--<div class="modal fade" id="enroll_modal" tabindex="-1" role="dialog" aria-labelledby="enrollModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="enrollModalLabel">Enroll in a Class</h5>
+  <div class="modal fade" id="big-modal" tabindex="-1" role="dialog"aria-labelledby="myHugeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content big-modal-content">
+        <div class="modal-header big-modal-header">
+          <h5 class="modal-title big-modal-title" id="modalLabel">Loading...</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body big-modal-body">
+        </div>
+        <div class="modal-footer big-modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
-  </div>-->
+  </div>
+
+  <iframe id="printing-frame" name="print_frame" src="about:blank" style="display:none;"></iframe>
 
   <script src="{% static 'scheduler/calendar.js' %}" type="text/javascript"></script>
 {% endblock %}

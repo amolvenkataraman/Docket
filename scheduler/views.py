@@ -25,6 +25,8 @@ def get_data(request):
     context["data"]["assignments"] = []
     context["data"]["events"] = []
     context["data"]["org_events"] = []
+    context["data"]["days"] = []
+    context["data"]["slots"] = []
     for class_ in classes:
         context["data"]["class"].append(class_.getinfo())
         if timespan == "month":
@@ -37,14 +39,21 @@ def get_data(request):
                 assignments = Assignment.objects.filter(Class=class_, deadline__date=datetime.datetime.now().date)
             else:
                 assignments = Assignment.objects.filter(Class=class_, deadline__date=time)
-        events = Event.objects.filter(Class=class_)
-        org_events = Org_Event.objects.filter()
-        for assignment in assignments:
-            context["data"]["assignments"].append(assignment.getinfo())
-        for event in events:
-            context["data"]["events"].append(event.getinfo())
-        for org_event in org_events:
-            context["data"]["org_events"].append(org_event.getinfo())
+    events = Event.objects.filter(Class=class_)
+    org_events = Org_Event.objects.filter()
+    for assignment in assignments:
+        context["data"]["assignments"].append(assignment.getinfo())
+    for event in events:
+        context["data"]["events"].append(event.getinfo())
+    for org_event in org_events:
+        context["data"]["org_events"].append(org_event.getinfo())
+
+    days = Day.objects.all()
+    slots = Slot.objects.all()
+    for day in days:
+        context["data"]["days"].append(day.getinfo())
+    for slot in slots:
+        context["data"]["slots"].append(slot.getinfo())
     return JsonResponse(context)
 
 @login_required(login_url="login/")
@@ -98,23 +107,6 @@ def enroll(request):
         except IndexError:
             return JsonResponse({"status": "error", "data": "Invalid Invite Code"})
 
-"""
-    if request.method == 'GET':
-        class_ = Class.objects.filter(id=request.GET.get('class'))[0]
-        if class_ in request.user.class_student.all():
-            return HttpResponse("You are already enrolled in this class")
-        else:
-            return render(request, 'scheduler/enroll.html', class_.getinfo())
-    else:
-        class_ = Class.objects.filter(id=request.GET.get('class'))[0]
-        if class_ in request.user.class_student.all():
-            return HttpResponse("You are already enrolled in this class")
-        else:
-            class_.students.add(request.user)
-            messages.success(request, f'Successfully enrolled in {class_.name}.')
-            return redirect('/')
-"""
-
 @login_required(login_url="login/")
 def class_(request):
     if request.method == 'GET':
@@ -136,6 +128,20 @@ def class_(request):
             return HttpResponse("OK")
         else:
             return HttpResponse("Only teachers are allowed to access this")
+
+def calendar(request):
+    context = {
+        "days": [],
+        "slots": [],
+    }
+    days = Day.objects.all()
+    slots = Slot.objects.all()
+
+    for day in days:
+        context["days"].append(day.getinfo())
+    for slot in slots:
+        context["slots"].append(slot.getinfo())
+    return render(request, 'scheduler/calendar.html', context)
 
 def stats(request):
     context = {

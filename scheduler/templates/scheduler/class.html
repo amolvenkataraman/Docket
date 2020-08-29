@@ -23,7 +23,7 @@
                         }
                         else
                         {
-                            alert("Something went wrong on the server-side. Please try again.")
+                            document.querySelector('.name').value = "Please enter a class name"
                         }
 					}
                     request.send(document.querySelector('.name').value)
@@ -73,11 +73,6 @@
 				<label for="name">Name of class</label>
 				<input class="form-control name" id="name" type="text" placeholder="Name of class">
 				<p class="text-danger name-warn"></p>
-
-				<div class="custom-control custom-checkbox scheduledclass">
-					<input type="checkbox" class="custom-control-input scheduledclass-cb" id="customCheck1">
-					<label class="custom-control-label" for="customCheck1">This class is scheduled (It can be added to a student timetable)</label>
-				</div>
 
 				<br>
 				<strong><p class="text-warning">WARNING: Please create a unique class for EACH SECTION you teach. Classes once created can only be deleted by an administrator.</p></strong>

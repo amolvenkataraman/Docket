@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'scheduler.apps.SchedulerConfig',
+    'chat.apps.ChatConfig',
     'crispy_forms',
     'reset_migrations',
     'django.contrib.admin',
