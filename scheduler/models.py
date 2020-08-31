@@ -1,5 +1,6 @@
 from django.db import models
-from users.models import DocketUser
+from users.models import *
+from map.models import *
 
 # Create your models here.
 class Day(models.Model):
@@ -55,8 +56,7 @@ class Class(models.Model):
     name = models.CharField(max_length=64, unique=True)
     teacher = models.ForeignKey(DocketUser, on_delete=models.SET("DELETED_USER"), related_name='class_teacher')
     students = models.ManyToManyField(DocketUser, related_name='class_student')
-    #room = "LOL"
-    scheduled_class = models.BooleanField(default=False)
+    room = models.ForeignKey(Room, on_delete=models.SET("DELETED ROOM"), related_name='class_room')
     period = models.ManyToManyField(Period, related_name='class_period')
     active = models.BooleanField(default=True)
 
@@ -67,10 +67,10 @@ class Class(models.Model):
         ans = {
             "id": self.id,
             "name": self.name,
-            "teacher": self.teacher.username,
-            "scheduled_class": self.scheduled_class,
-            "period": [],
-            "active": self.active,
+            "teacher": self.teacher.getinfo(),
+            "room": self.room.getinfo(),
+            "period": [i.getinfo() for i in self.period.all()],
+            "active": str(self.active),
         }
 
         for i in self.period.all():

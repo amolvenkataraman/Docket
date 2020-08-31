@@ -21,14 +21,8 @@ def get_data(request):
     time = request.GET.get("time")
     context = {"data": {}}
     classes = request.user.class_student.all()
-    context["data"]["class"] = []
-    context["data"]["assignments"] = []
-    context["data"]["events"] = []
-    context["data"]["org_events"] = []
-    context["data"]["days"] = []
-    context["data"]["slots"] = []
+    context["data"]["class"] = [i.getinfo() for i in classes]
     for class_ in classes:
-        context["data"]["class"].append(class_.getinfo())
         if timespan == "month":
             if time == None:
                 assignments = Assignment.objects.filter(Class=class_, deadline__month=(datetime.datetime.now().month))
@@ -41,19 +35,13 @@ def get_data(request):
                 assignments = Assignment.objects.filter(Class=class_, deadline__date=time)
     events = Event.objects.filter(Class=class_)
     org_events = Org_Event.objects.filter()
-    for assignment in assignments:
-        context["data"]["assignments"].append(assignment.getinfo())
-    for event in events:
-        context["data"]["events"].append(event.getinfo())
-    for org_event in org_events:
-        context["data"]["org_events"].append(org_event.getinfo())
 
-    days = Day.objects.all()
-    slots = Slot.objects.all()
-    for day in days:
-        context["data"]["days"].append(day.getinfo())
-    for slot in slots:
-        context["data"]["slots"].append(slot.getinfo())
+    context["data"]["assignments"] = [i.getinfo() for i in assignments]
+    context["data"]["events"] = [i.getinfo() for i in events]
+    context["data"]["org_events"] = [i.getinfo() for i in org_events]
+    context["data"]["days"] = [i.getinfo() for i in Day.objects.all()]
+    context["data"]["slots"] = [i.getinfo() for i in Slot.objects.all()]
+    context["data"]["periods"] = [i.getinfo() for i in Period.objects.all()]
     return JsonResponse(context)
 
 @login_required(login_url="login/")
@@ -111,6 +99,30 @@ def enroll(request):
 def class_(request):
     if request.method == 'GET':
         if request.user.teacher == True:
+            context = {
+                "class": [],
+                "groups": [],
+                "invites": [],
+                "days": [i.getinfo() for i in Day.objects.all()],
+                "slots": [i.getinfo() for i in Slot.objects.all()],
+                "periods": [i.getinfo() for i in Period.objects.all()],
+            }
+
+            classes = Class.objects.filter(teacher=request.user)
+            for class_ in classes:
+                temp = class_.getinfo()
+                temp["students"] = [i.getinfo() for i in class_.students.all()]
+                context["class"].append(temp)
+
+                for i in Group.objects.filter(classes=class_):
+                    context["groups"].append(i.getinfo())
+                for i in Invite.objects.filter(Class=class_):
+                    context["invites"].append(i.getinfo())
+
+            return render(request, 'scheduler/class.html', {"data": context})
+"""
+    if request.method == 'GET':
+        if request.user.teacher == True:
             context = {"classes": []}
             for c in Class.objects.filter(teacher=request.user):
                 temp = c.getinfo()
@@ -128,6 +140,7 @@ def class_(request):
             return HttpResponse("OK")
         else:
             return HttpResponse("Only teachers are allowed to access this")
+"""
 
 def calendar(request):
     context = {

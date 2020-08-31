@@ -205,8 +205,8 @@
         ds.onclick = () => {
           setTimeout(function() {
             dp = ds.parentElement
-            document.querySelector('.modal-title').innerHTML = dp.dataset.date + " " + months[m]
-            document.querySelector('.modal-body').innerHTML = ""
+            document.querySelector('.big-modal-title').innerHTML = dp.dataset.date + " " + months[m]
+            document.querySelector('.big-modal-body').innerHTML = ""
 
             e = data["events"]
             for (i = 0; i < e.length; i++)

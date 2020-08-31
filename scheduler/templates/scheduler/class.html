@@ -6,6 +6,57 @@
 {% block script %}
     <script>
 		document.addEventListener('DOMContentLoaded', () => {
+			data = JSON.parse("{{ data }}".replace(/&#x27;/g,'"'))
+			console.log(data)
+
+			document.querySelector('.create_class').onclick = () => {
+				setTimeout(function () {
+					document.querySelector('.modal-title').innerHTML = "Create a Class"
+					document.querySelector('.modal-body').innerHTML = `
+						<label for="name">Name of class</label>
+						<input class="form-control name" id="name" type="text" placeholder="Name of class">
+						<p class="text-danger name-warn"></p>
+
+						<br>
+						<strong><p class="text-warning">WARNING: Please create a unique class for EACH SECTION you teach. Classes once created can only be deleted by an administrator.</p></strong>
+					`
+				}, 100)
+			}
+
+			document.querySelectorAll('.class-students-btn').forEach(btn => {
+				btn.onclick = () => {
+					class_ = data["class"][btn.parentElement.parentElement.dataset.class - 1]
+					setTimeout(function () {
+						document.querySelector('.modal-title').innerHTML = `Students for ${class_.name}`
+						document.querySelector('.modal-body').innerHTML = "<ul class='student-list'></ul>"
+						for (i = 0; i < class_["students"].length; i++) {
+							if (class_["teacher"]["id"] == class_["students"][i]["id"]) {
+								document.querySelector('.student-list').innerHTML += `
+									<li style="color: blue;">
+									${class_["students"][i]["first_name"]} 
+									${class_["students"][i]["last_name"]} 
+									(${class_["students"][i]["username"]}) 
+									[TEACHER]
+									</li>
+								`
+							}
+							else {
+								document.querySelector('.student-list').innerHTML += `
+									<li>
+									${class_["students"][i]["first_name"]} 
+									${class_["students"][i]["last_name"]} 
+									(${class_["students"][i]["username"]})
+									</li>
+								`
+							}
+						}
+						//console.log(class_)
+					}, 100)
+				}
+			})
+		})
+
+		/*document.addEventListener('DOMContentLoaded', () => {
 			document.querySelector('.create').onclick = () => {
 				if (document.querySelector('.name').value === "")
 				{
@@ -29,7 +80,7 @@
                     request.send(document.querySelector('.name').value)
 				}
 			}
-		})
+		})*/
     </script>
 {% endblock %}
 
@@ -45,37 +96,31 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for row in classes %}
-				<tr>
+			{% for row in data.class %}
+				<tr data-class="{{ forloop.counter }}">
 					<td>{{ forloop.counter }}</th>
-					<td><button type="submit" class="btn btn-link">{{ row.name }}</button></td>
-					<td><button type="submit" class="btn btn-link">{{ row.students | length }}</button></td>
+					<td><button class="btn btn-link">{{ row.name }}</button></td>
+					<td><button class="btn btn-link class-students-btn" data-toggle="modal" data-target="#modal">{{ row.students | length }}</button></td>
                     <!--<td><a href='{% url "enroll" %}?class={{ row.id }}' target="_blank">Link</a></td>-->
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 	<br>
-	<center><button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#classModal" style="width: 30%;">Create a class</button></center>
+	<center><button type="submit" class="btn btn-primary create_class" data-toggle="modal" data-target="#modal" style="width: 30%;">Create a class</button></center>
     <br>
 	<br>
 	
-	<div class="modal fade" id="classModal" tabindex="-1" role="dialog" aria-labelledby="classModalLabel" aria-hidden="true">
+	<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 		  <div class="modal-content">
 			<div class="modal-header">
-			  <h5 class="modal-title" id="classModalLabel">Create a Class</h5>
+			  <h5 class="modal-title" id="modalLabel"></h5>
 			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			  </button>
 			</div>
 			<div class="modal-body">
-				<label for="name">Name of class</label>
-				<input class="form-control name" id="name" type="text" placeholder="Name of class">
-				<p class="text-danger name-warn"></p>
-
-				<br>
-				<strong><p class="text-warning">WARNING: Please create a unique class for EACH SECTION you teach. Classes once created can only be deleted by an administrator.</p></strong>
 			</div>
 			<div class="modal-footer">
 			  <button type="button" class="btn btn-primary create">Create</button>

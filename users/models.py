@@ -17,9 +17,11 @@ class DocketUser(AbstractUser):
         ans = {
             "id": self.id,
             "username": self.username,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
             "email": self.email,
-            "teacher": self.teacher,
-            "newuser": self.newuser,
+            "teacher": str(self.teacher),
+            "newuser": str(self.newuser),
         }
 
         return ans
