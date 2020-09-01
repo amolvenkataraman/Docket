@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Map {% endblock %}
+
+{% block script %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            var map = L.map('map-div', {
+                crs: L.CRS.Simple,
+                minZoom: -5
+            })
+
+            r = new XMLHttpRequest()
+            r.open("GET", "{% url 'map_image' %}?venue_id=1&data=size")
+            r.onload = () => {
+                res = JSON.parse(r.responseText)
+
+                var bounds = [[0, 0], [res["height"], res["width"]]];
+                var image = L.imageOverlay("{% url 'map_image' %}?venue_id=1", bounds).addTo(map);
+
+                //L.marker(L.latLng([ 0, 0 ])).addTo(map)
+
+                map.setView( [res["height"] / 2, res["height"] / 2], -1)
+            }
+            r.send()
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <link href="{% static 'map/styles.css' %}" rel="stylesheet" media="all"/>
+
+    <div id="map-div" style="height: 90vh"></div>
+
+    <div id="panel">
+        <!-- Dissmiss button to close Sidepanel -->
+        <button class="btn btn-secondary" type="button" id="closeBtn" onclick="closePanel();">
+          &times;
+        </button>
+        <p id="panelContent">
+        <h2 id="panelTitle">Title</h2>
+        <span id="panelText">Text</span>    
+        </p>
+      </div>
+{% endblock %}

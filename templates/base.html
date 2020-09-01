@@ -58,6 +58,7 @@
                         <li class="nav-item" data-toggle="tooltip" data-placement="top" title="Statistics"><a href="{% url 'stats' %}"><i class="fas fa-chart-bar" style="margin-top: 10px; margin-right: 10px;"></i></a></li>
                       {% endif %}
                       {% if user.is_authenticated %}
+                        <li class="nav-item" data-toggle="tooltip" data-placement="top" title="Map"><a href="{% url 'map' %}"><i class="fas fa-map-marked-alt" style="margin-top: 10px; margin-right: 10px;"></i></a></li>
                         <div class="dropleft">
                           <button class="btn btn-link dropdown-toggle"
                                   type="button" id="dropdownMenu1" data-toggle="dropdown"

@@ -1,0 +1,11 @@
+#panel{
+    position: fixed;
+    z-index: 401;
+    width: 100vw;
+    left: -500px;
+    top:100px;
+    bottom: 0;
+    overflow-y: scroll;
+    background: #FFFFFF;
+    transition: all 0.3s; /* gives a "sliding" effect */
+  }

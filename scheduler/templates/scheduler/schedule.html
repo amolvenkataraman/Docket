@@ -117,7 +117,7 @@
                   temp = data["class"][k]["period"][l]
                   
                   if (temp["day"]["id"] === data["days"][j]["id"] && temp["period"]["id"] === data["slots"][i]["id"]) {
-                    currData.innerHTML = `${data["class"][k]["name"]}<br>${data["class"][k]["teacher"]}`
+                    currData.innerHTML = `${data["class"][k]["name"]}<br>${data["class"][k]["teacher"]["first_name"]}`
                   }
                 }
               }
