@@ -22,6 +22,7 @@ def get_data(request):
     context = {"data": {}}
     classes = request.user.class_student.all()
     context["data"]["class"] = [i.getinfo() for i in classes]
+    assignments1 = []
     for class_ in classes:
         if timespan == "month":
             if time == None:
@@ -33,10 +34,12 @@ def get_data(request):
                 assignments = Assignment.objects.filter(Class=class_, deadline__date=datetime.datetime.now().date)
             else:
                 assignments = Assignment.objects.filter(Class=class_, deadline__date=time)
+        for i in assignments:
+            assignments1.append(i)
     events = Event.objects.filter(Class=class_)
     org_events = Org_Event.objects.filter()
 
-    context["data"]["assignments"] = [i.getinfo() for i in assignments]
+    context["data"]["assignments"] = [i.getinfo() for i in assignments1]
     context["data"]["events"] = [i.getinfo() for i in events]
     context["data"]["org_events"] = [i.getinfo() for i in org_events]
     context["data"]["days"] = [i.getinfo() for i in Day.objects.all()]

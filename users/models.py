@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 class DocketUser(AbstractUser):
     email = models.EmailField('Email address', unique=True)
+    parent = models.BooleanField(default=False)
     teacher = models.BooleanField(default=False)
     newuser = models.BooleanField(default=True)
 
@@ -20,6 +21,7 @@ class DocketUser(AbstractUser):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
+            "parent": str(self.parent),
             "teacher": str(self.teacher),
             "newuser": str(self.newuser),
         }

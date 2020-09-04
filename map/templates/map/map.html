@@ -7,43 +7,347 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
 
+    <script id="panel-normal" type="text/x-handlebars-template">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for a room" aria-label="" aria-describedby="basic-addon1">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button">Search</button>
+            </div>
+        </div>
+        <br>
+
+        <div class="form-group">
+            <label for="venue-select">Select a venue</label>
+            <select class="custom-select" id="venue-select" onchange="show_map()">
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="floor-select">Select a floor</label>
+            <select class="custom-select" id="floor-select" onchange="show_map()">
+            </select>
+        </div>
+
+        {% if request.user.is_superuser %}
+            <br>
+            <button type="button" class="btn btn-primary" style="width: 100%;" onclick="add_edit()">Add / Edit</button>
+        {% endif %}
+    </script>
+
+    <script id="panel-add_edit" type="text/x-handlebars-template">
+        <center><h3>Add / Edit mode</h3></center>
+        <center><h4>Refresh page to exit</h4></center>
+        <br>
+        <h5>Add New:</h5>
+        <div class="btn-group-vertical" role="group" aria-label="Add" style="width: 100%;">
+            <button type="button" class="btn btn-secondary add-new" data-add_type="room" style="width: 100%;">Room</button>
+            <button type="button" class="btn btn-secondary add-new" data-add_type="floor_transport" style="width: 100%;">Floor Transport</button>
+            <button type="button" class="btn btn-secondary add-new" data-add_type="entrance" style="width: 100%;">Entrance / Exit</button>
+        </div>
+    </script>
+
     <script>
+        var map
+        var panel = false
+        var data
+        var venue
+        var floor
+        var markers = []
+        var rooms = []
+        const panel_normal = Handlebars.compile(document.querySelector("#panel-normal").innerHTML)
+        const panel_add_edit = Handlebars.compile(document.querySelector("#panel-add_edit").innerHTML)
+
+        {% if request.user.is_superuser %}
+            var edit = false
+        {% endif %}
+
         document.addEventListener('DOMContentLoaded', () => {
-            var map = L.map('map-div', {
+            data = JSON.parse("{{ data }}".replace(/&#x27;/g,'"'))
+            console.log(data)
+
+            document.querySelector('#panel').innerHTML = panel_normal({})
+
+            togglePanel()
+            change_height()
+            window.addEventListener('resize', change_height)
+
+            map = L.map('map-div', {
                 crs: L.CRS.Simple,
-                minZoom: -5
+                minZoom: -5,
+                zoomControl: false
             })
 
+            map.attributionControl.addAttribution('Mapping by Amol Venkataraman');
+            new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
+
+            populate()
+
+            show_map()
+        })
+
+        function change_height() {
+            document.querySelector('#map-div').style.height = (window.innerHeight - 104).toString() + "px"
+            document.querySelector('#panel').style.height = (window.innerHeight - 104).toString() + "px"
+        }
+
+        function populate() {
+            venue_select = document.querySelector('#venue-select')
+
+            for (i = 0; i < data["venues"].length; i++) {
+                if (data["venues"][i]["main"] == "True") {
+                    venue_select.innerHTML += `<option selected value="${data["venues"][i]["id"]}">${data["venues"][i]["name"]}</option>`
+                }
+                else {
+                    venue_select.innerHTML += `<option value="${data["venues"][i]["id"]}">${data["venues"][i]["name"]}</option>`
+                }
+            }
+
+            floor_select = document.querySelector('#floor-select')
+
+            for (i = 0; i < data["floors"].length; i++) {
+                if (data["floors"][i]["main"] == "True") {
+                    floor_select.innerHTML += `<option selected value="${data["floors"][i]["level"]}">${data["floors"][i]["name"]}</option>`
+                }
+                else {
+                    floor_select.innerHTML += `<option value="${data["floors"][i]["level"]}">${data["floors"][i]["name"]}</option>`
+                }
+            }
+        }
+
+        function show_map() {
+            venue = document.querySelector('#venue-select').value
+            floor = document.querySelector('#floor-select').value
+
             r = new XMLHttpRequest()
-            r.open("GET", "{% url 'map_image' %}?venue_id=1&data=size")
+            r.open("GET", `{% url 'map_image' %}?venue_id=${venue}&floor=${floor}&data=size`)
             r.onload = () => {
                 res = JSON.parse(r.responseText)
 
                 var bounds = [[0, 0], [res["height"], res["width"]]];
-                var image = L.imageOverlay("{% url 'map_image' %}?venue_id=1", bounds).addTo(map);
-
-                //L.marker(L.latLng([ 0, 0 ])).addTo(map)
+                var image = L.imageOverlay(
+                    `{% url 'map_image' %}?venue_id=${venue}&floor=${floor}`,
+                    bounds
+                ).addTo(map);
 
                 map.setView( [res["height"] / 2, res["height"] / 2], -1)
             }
             r.send()
-        })
+
+            for (i = 0; i < rooms.length; i++) {
+                map.removeLayer(rooms[i])
+            }
+
+            for (i = 0; i < data["rooms"].length; i++) {
+                room = data["rooms"][i]
+                if (room["venue"]["id"] == venue && room["floor"]["id"] == floor) {
+                    temp = L.polygon(
+                        [[room['bllat'], room['bllng']], [room['bllat'], room['trlng']], [room['trlat'], room['trlng']], [room['trlat'], room['bllng']]],
+                        {'opacity': 0, 'fillOpacity': 0}
+                    ).addTo(map)
+                    temp["data"] = room
+                    rooms.push(temp)
+                }
+            }
+
+            map.eachLayer(function (layer) {
+                layer.on('click', function(e) {
+                    map.eachLayer(function (layer1) {
+                        try {
+                            layer1.setStyle({'opacity': 0, 'fillOpacity': 0})
+                        }
+                        catch (err) {}
+                    })
+                    layer.setStyle({'opacity': 1, 'fillOpacity': 0.2})
+                    
+                    data_ = layer["data"]
+                    var popup = L.popup()
+                        .setLatLng({
+                            "lat": (layer["_bounds"]["_northEast"]["lat"] + layer["_bounds"]["_southWest"]["lat"]) / 2,
+                            "lng": (layer["_bounds"]["_northEast"]["lng"] + layer["_bounds"]["_southWest"]["lng"]) / 2})
+                        .setContent(`
+                            <h5>${data_["name"]}</h5><br>
+                            ${data_["venue"]["name"]} (${data_["floor"]["name"]})<br>
+                            Room type: ${data_["type"]["name"]}
+                        `)
+                        .openOn(map)
+                })
+            }) 
+        }
+
+        {% if request.user.is_superuser %}
+            function add_edit() {
+                map.eachLayer(function (layer1) {
+                    try {
+                        layer1.setStyle({'opacity': 1, 'fillOpacity': 0.2})
+                    }
+                    catch (err) {}
+                })
+
+                panel = document.querySelector('#panel')
+                panel.innerHTML = panel_add_edit({})
+
+                document.querySelectorAll('.add-new').forEach(btn => {
+                    btn.onclick = () => {
+                        temp = btn.dataset.add_type
+                        if (temp == 'room') {
+                            var blmarker
+                            var trmarker
+                            var blcoords = -1
+                            var trcoords = -1
+
+                            document.querySelector('#map-div').style.cursor='crosshair'
+                            document.querySelector('#panel').innerHTML = `
+                            Please select the BOTTOM-LEFT point. Press the button below to confirm
+                            <br>
+                            <button type="button" class="btn btn-primary confirm-bl-btn">Confirm</button>
+                            `
+                            function getbl(e) {
+                                if (e.latlng["lat"] >= 0 && e.latlng["lng"] >= 0 && e.latlng["lat"] <= res["height"] && e.latlng["lng"] <= res["width"]) {
+                                    try {
+                                        map.removeLayer(blmarker)
+                                    }
+                                    catch (e) {}
+                                    blmarker = new L.marker(e.latlng).addTo(map)
+                                    blcoords = [e.latlng["lat"], e.latlng["lng"]]
+                                }
+                            }
+                            map.on('click', getbl)
+
+                            document.querySelector('.confirm-bl-btn').onclick = () => {
+                                if (blcoords == -1) {
+                                    document.querySelector('#panel').innerHTML += "<p class='text-danger'>Please select a location</p>"
+                                }
+                                else {
+                                    document.querySelector('#panel').innerHTML = `
+                                    Please select the TOP-RIGHT point. Press the button below to confirm
+                                    <br>
+                                    <button type="button" class="btn btn-primary confirm-tr-btn">Confirm</button>
+                                    `
+
+                                    map.off('click', getbl)
+
+                                    function gettr(e) {
+                                        if (e.latlng["lat"] >= 0 && e.latlng["lng"] >= 0 && e.latlng["lat"] <= res["height"] && e.latlng["lng"] <= res["width"]) {
+                                            try {
+                                                map.removeLayer(trmarker)
+                                            }
+                                            catch (e) {}
+                                            trmarker = new L.marker(e.latlng).addTo(map)
+                                            trcoords = [e.latlng["lat"], e.latlng["lng"]]
+                                        }
+                                    }
+                                    map.on('click', gettr)
+
+                                    document.querySelector('.confirm-tr-btn').onclick = () => {
+                                        if (blcoords == -1) {
+                                            document.querySelector('#panel').innerHTML += "<p class='text-danger'>Please select a location</p>"
+                                        }
+                                        else {
+                                            map.off('click', gettr)
+                                            document.querySelector('#panel').innerHTML = `
+                                            Please fill in the following information:
+                                            <br><br>
+                                            <label for="room-name">Room name</label>
+                                            <input type="text" class="form-control" id="room-name" placeholder="Room name">
+                                            <br>
+                                            <label for="type-select">Room type</label>
+                                            <select class="custom-select" id="type-select">
+                                                <option selected value="-1">Select a type</option>
+                                            </select>
+                                            <br><br>
+                                            <label for="description">Info / Description</label>
+                                            <textarea class="form-control description" id="description" rows="3"></textarea>
+                                            <br><br>
+                                            <button type="button" class="btn btn-primary confirm-type-btn">Confirm</button>
+                                            `
+                                            for (i = 0; i < data["types"].length; i++) {
+                                                document.querySelector("#type-select").innerHTML += `<option value="${data["types"][i]["id"]}">${data["types"][i]["name"]}</option>`
+                                            }
+
+                                            document.querySelector('.confirm-type-btn').onclick = () => {
+                                                if (document.querySelector('#room-name').value == "" || document.querySelector('#type-select').value == "-1") {
+                                                    document.querySelector('#panel').innerHTML += "<p class='text-danger'>Please fill in all the values</p>"
+                                                }
+                                                else {
+
+
+                                                    map.removeLayer(blmarker)
+                                                    map.removeLayer(trmarker)
+
+                                                    temp = L.polygon(
+                                                        [[blcoords[0], blcoords[1]], [blcoords[0], trcoords[1]], [trcoords[0], trcoords[1]], [trcoords[0], blcoords[1]]],
+                                                        {'opacity': 1, 'fillOpacity': 0.2}
+                                                    ).addTo(map)
+                                                    rooms.push(temp)
+
+                                                    r = new XMLHttpRequest()
+                                                    r.open("POST", `{% url 'add_loc' %}`)
+                                                    r.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+                                                    r.setRequestHeader("Content-Type", "application/json");
+                                                    r.onload = () => {
+                                                        location.reload()
+                                                    }
+                                                    r.send(JSON.stringify({
+                                                        "item": "room",
+                                                        "name": document.querySelector('#room-name').value,
+                                                        "venue": venue,
+                                                        "floor": floor,
+                                                        "type": document.querySelector('#type-select').value,
+                                                        "info": document.querySelector('#description').value,
+                                                        "bllat": blcoords[0],
+                                                        "bllng": blcoords[1],
+                                                        "trlat": trcoords[0],
+                                                        "trlng": trcoords[1],
+                                                    }))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        else if (temp == "floor_transport") {}
+                        else if (temp == "entrance") {}
+                    }
+                })
+            }
+        {% endif %}
+
+        function createPolygon() {
+            var polygon = L.polygon(coords).addTo(map)
+            coords = []
+            for (i = 0; i < markers.length; i++) {
+                map.removeLayer(markers[i])
+            }
+        }
+
+        function togglePanel() {
+            if (panel == true) {
+                panel = false;
+                document.querySelector('#panel').style.display='none';
+                document.querySelector('.open').style.marginLeft = "0px"
+                document.querySelector('.open').innerHTML = ">"
+            }
+            else {
+                panel = true;
+                document.querySelector('#panel').style.display = 'block';
+                document.querySelector('.open').style.marginLeft = (window.innerWidth * 0.2).toString() + "px"
+                document.querySelector('.open').innerHTML = "<"
+            }
+        }
     </script>
 {% endblock %}
 
 {% block body %}
     <link href="{% static 'map/styles.css' %}" rel="stylesheet" media="all"/>
 
-    <div id="map-div" style="height: 90vh"></div>
+    <button type="button" class="open btn btn-secondary" aria-label="Open" onclick="togglePanel()">
+        <span aria-hidden="true">></span>
+    </button>
 
     <div id="panel">
-        <!-- Dissmiss button to close Sidepanel -->
-        <button class="btn btn-secondary" type="button" id="closeBtn" onclick="closePanel();">
-          &times;
-        </button>
-        <p id="panelContent">
-        <h2 id="panelTitle">Title</h2>
-        <span id="panelText">Text</span>    
-        </p>
-      </div>
+    </div>
+
+      <div id="map-div" style="height: 90vh"></div>
 {% endblock %}

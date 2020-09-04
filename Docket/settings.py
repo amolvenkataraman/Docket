@@ -25,7 +25,7 @@ SECRET_KEY = 'REDACTED'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -112,7 +112,7 @@ AUTH_USER_MODEL = 'users.DocketUser'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'EST'
+TIME_ZONE = 'Canada/Eastern'
 
 USE_I18N = True
 

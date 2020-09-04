@@ -1,11 +1,27 @@
-#panel{
+#panel {
     position: fixed;
-    z-index: 401;
-    width: 100vw;
-    left: -500px;
-    top:100px;
-    bottom: 0;
-    overflow-y: scroll;
-    background: #FFFFFF;
-    transition: all 0.3s; /* gives a "sliding" effect */
-  }
+    z-index: 65536;
+    width: 20%;
+    height: 87vh;
+    padding: 10px;
+    background: #f8f9fa;
+    /*transition: all 0.3s;  gives a "sliding" effect */
+}
+
+.open {
+    position: fixed;
+    z-index: 65536;
+    margin-top: 5px;
+}
+
+.close {
+    margin-right: 10px;
+}
+
+.leaflet-control-zoom {
+    margin-bottom: 30px!important;
+}
+
+.leaflet-container {
+    background-color:rgba(255, 255, 255)!important;
+}

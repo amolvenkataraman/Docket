@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Error 403 {% endblock %}
+
+{% block script %}
+
+{% endblock %}
+
+{% block body %}
+    <center><h1 style="font-size: 200px;">403</h1></center>
+    <center>The page that you requested is forbidden!
+    This could mean you are trying to access an admin page.</center>
+    <br>
+    <center><a href="https://forms.gle/KysrWCVgyDZDKw7Q9">Report a bug</a> | <a href="{% url 'index' %}">Go back home</a></center>
+{% endblock %}
