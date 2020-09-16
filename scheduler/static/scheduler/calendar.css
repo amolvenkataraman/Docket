@@ -1,6 +1,8 @@
 .wrapper {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  right: 0;
+  width: 85%;
+  height: calc(100vh - 56px - 48px);
   overflow: auto;
   display: flex;
   flex-flow: column;
@@ -13,8 +15,6 @@
   height: 100%;
   margin: 0 auto;
   overflow: auto;
-  display: flex;
-  flex-flow: column;
 }
 
 .button-container-calendar button {
@@ -29,9 +29,13 @@
 }
 
 .table-calendar {
+  display: inline-table;
+  table-layout: fixed;
   border-collapse: collapse;
+  overflow: scroll;
   width: 100%;
-  height: 70%;
+  height: calc(100% - 160px);
+  grid-auto-rows: 1fr;
 }
 
 .table-calendar td, .table-calendar th {
@@ -41,11 +45,17 @@
   vertical-align: top;
 }
 
+.date-picker, .table-calendar tr, .table-calendar td{
+  table-layout: fixed;
+  overflow: hidden;
+}
+
 .date-picker {
-  width: 14%;
-  height: auto;
-  min-height: 10%;
-  max-height: 15%;
+  width: 100%;
+}
+
+.date-picker div, .date-picker button, .date-picker font {
+  overflow: hidden;
 }
 
 .date-picker.selected {
@@ -58,6 +68,11 @@
 }
 
 .date-span {
+  cursor: pointer;
+  
+}
+
+.assignment-button {
   cursor: pointer;
 }
 
@@ -92,8 +107,6 @@ color: red;
 }
 
 .footer-container-calendar {
-  margin-top: 1em;
-  border-top: 1px solid #dadada;
   padding: 10px 0;
 }
 

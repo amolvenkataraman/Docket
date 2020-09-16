@@ -170,3 +170,10 @@ class Org_Event(models.Model):
             "holiday": self.holiday,
         }
         return ans
+
+class Board(models.Model):
+    Class = models.ForeignKey(Class, on_delete=models.SET('DELETED_CLASS'))
+    date_time = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=256)
+    description = models.TextField()
+    img = models.ImageField(upload_to='boards', null=True)

@@ -20,11 +20,11 @@ def register_view(request):
             return redirect('login')
     else:
         form = UserRegisterForm()
-        messages.warning(request, 'Teachers, please register now and contact me for administrative access.')
     return render(request, 'users/register.html', {'form': form})
 
 # Log a user in or return the login page
 def login_view(request):
+    error = ""
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -35,9 +35,11 @@ def login_view(request):
                 return redirect(request.POST.get('next'))
             else:
                 return redirect('index')
+        else:
+            error = "Please enter a correct username and password. Note that both fields are case-sensitive."
     else:
         form = AuthenticationForm
-    return render(request, 'users/login.html', {'form': form})
+    return render(request, 'users/login.html', {'form': form, 'error': error})
 
 # Log a user out and redirect to login
 def logout_view(request):

@@ -4,26 +4,94 @@
 
 {% block title %} Login {% endblock %}
 
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            var fields = document.querySelectorAll(".textb input")
+            var btn = document.querySelector(".submit-btn")
+
+            function check() {
+                if(fields[0].value != "" && fields[1].value != "")
+                    btn.disabled = false
+                else
+                    btn.disabled = true
+            }
+
+            function style_placeholders(inp) {
+                if (inp.value == "") {
+                    placeholder = inp.parentElement.parentElement.parentElement.querySelector('.placeholder')
+                    placeholder.style.fontSize = "14px"
+                    placeholder.style.top = "0"
+                    placeholder.style.left = "20px"
+                }
+                else {
+                    placeholder = inp.parentElement.parentElement.parentElement.querySelector('.placeholder')
+                    placeholder.style.fontSize = "10px"
+                    placeholder.style.top = "-20px"
+                    placeholder.style.left = "10px"
+                }
+            }
+
+            document.querySelectorAll('input').forEach(inp => {
+                check()
+                style_placeholders(inp)
+
+                inp.onkeyup = () => {
+                    check()
+                    style_placeholders(inp)
+                }
+            })
+
+            document.querySelector(".show-password").addEventListener("click", function(){
+                if (this.classList[2] == "fa-eye-slash") {
+                    this.classList.remove("fa-eye-slash")
+                    this.classList.add("fa-eye")
+                    fields[1].type = "text"
+                }
+                else {
+                    this.classList.remove("fa-eye")
+                    this.classList.add("fa-eye-slash")
+                    fields[1].type = "password"
+                }
+            })
+        })
+    </script>
+{% endblock %}
+
 {% block body %}
 <link href="{% static 'users/styles.css' %}" rel="stylesheet"/>
-  <div class="login-register-form">
-    <form method="POST">
-      {% csrf_token %}
-      <fieldset class="form-group">
-        <legend>Log In</legend>
-        <!-- Display the login form -->
-        {{ form|crispy }}
-        {% if request.GET.next %}
-          <input type="hidden" name="next" value="{{ request.GET.next }}">
-        {% endif %}
-      </fieldset>
-      <div class="form-group">
-        <button class="btn btn-outline-info" type="submit">Log In</button>
-      </div>
-    </form>
-    <div class="">
-      <!-- Provide link to register page -->
-      <small class="text-muted">Don't have an account? <a href="{% url 'register' %}">Register</a></small>
+<link href="{% static 'users/login.css' %}" rel="stylesheet"/>
+    <br>
+    <div class="login-form">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <center><strong><legend>Log In</legend></strong></center>
+                <div class="textb">
+                    {{ form.username|as_crispy_field }}
+                    <div class="placeholder">Username</div>
+                </div>
+
+                <div class="textb">
+                    {{ form.password|as_crispy_field }}
+                    <div class="placeholder">Password</div>
+                    <div class="show-password fas fa-eye-slash"></div>
+                </div>
+                {% if error %}
+                    <div class="error-text">{{ error }}</div>
+                {% endif %}
+                
+                {% if request.GET.next %}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                {% endif %}
+            </fieldset>
+            <div class="form-group">
+                <center><button class="btn btn-outline-info submit-btn" type="submit" disabled>Log In <span class="fas fa-arrow-right"></span></button></center>
+            </div>
+        </form>
+        <div class="">
+            <!-- Provide link to register page -->
+            <center><small class="text-muted"><a href="{% url 'register' %}">Register</a></small></center>
+        </div>
     </div>
-  </div>
 {% endblock %}

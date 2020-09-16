@@ -6,7 +6,7 @@
 {% block script %}
   <script id="calendar-item" type="text/x-handlebars-template">
     {% verbatim %}
-      <button type="button" class="unstyled-button assignment-button" data-class="{{ class }}" data-no="{{ i }}" data-type = "{{ type }}" data-toggle="modal" data-target="#modal"><font size="2" color="{{ color }}">{{ text }}</button></font>
+  <div class="assignment-button" data-class="{{ class }}" data-no="{{ i }}" data-type = "{{ type }}" data-toggle="modal" data-target="#modal" style="font-size: 12px; color: {{ color }};">{{ text }}</div>
     {% endverbatim %}
   </script>
 
@@ -26,9 +26,173 @@
     </div>
   </script>
 
+  <script id="enroll-code-prompt" type="text/x-handlebars-template">
+    <div class="input-group">
+      <input type="text" class="form-control enroll-code" placeholder="Enroll Code" aria-label="" aria-describedby="basic-addon1">
+      <div class="input-group-append">
+        <button class="btn btn-primary enroll-btn-1" type="button">Enroll</button>
+      </div>
+    </div>
+    <p class="text-danger enroll-warn"></p>
+  </script>
+
+  <script id="enroll-confirm" type="text/x-handlebars-template">
+    <center><h4>Enroll?</h4></center>
+    <p>Class name: {{ name }}</p>
+    <p>Teacher: {{ teacher }}</p>
+    <button type="submit" class="btn btn-success enroll-confirm-btn" style="width: 100%;">Enroll</button>
+    <br><br>
+    <a href="{% url 'index' %}"><button type="submit" class="btn btn-danger" style="width: 100%;" data-dismiss="modal">Don't Enroll</button></a>
+    <strong><p class="text-warning">WARNING: Do NOT enroll in a class that you are not really in.</p></strong>
+  </script>
+
+  <script id="timetable-template" type="text/x-handlebars-template">
+    <div id="timetable-printable">
+    <table class="timetable">
+    <thead class="timetable-head">
+    <tr class="timetable-head-row"></tr>
+    </thead>
+    <tbody class="timetable-body">
+    </tbody>
+    </table>
+    </div>
+    <button type="button" class="btn btn-link" onclick="printDiv('timetable-printable')">
+    Print Timetable
+    </button>
+  </script>
+
+  <script id="timetable-print-style" type="text/x-handlebars-template">
+    <style>
+        .timetable{font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;width: 100%;border-collapse: separate;border-spacing: 3px;}
+        .timetable td, .timetable th {border: 1px solid #ddd;padding: 8px;margin: 8px;}
+        .timetable tr:nth-child(even){background-color: #f2f2f2;}
+        .timetable th:nth-child(1){max-width: 30px;}
+        .timetable td:nth-child(1){max-width: 30px;}
+        .timetable th {padding-top: 12px;padding-bottom: 12px;text-align: left;}
+      </style>
+  </script>
+
+  {% if request.user.teacher %}
+    <script id="assignment-create-form" type="text/x-handlebars-template">
+      <div class="question-set">
+      <label for="class">Which class</label>
+      <select class="custom-select class-select" name="class-select">
+      <option selected value="">Select an class</option>
+      </select>
+      <p class="text-danger class-warn"></p>
+      <br>
+      <label for="name">Name of assignment</label>
+      <input class="form-control name" id="name" type="text" placeholder="Name of Assignment">
+      <p class="text-danger name-warn"></p>
+      <br>
+      <label for="deadline">Deadline</label>
+      <input type="date" class="form-control deadline" name="deadline" style="width: 100%;">
+      <br><br>
+      <input type="time" class="form-control deadline1" name="deadline1" style="width: 100%;">
+      <p class="text-danger deadline-warn"></p>
+      <br>
+      <label for="url">URL</label>
+      <input class="form-control url" id="url" type="url" placeholder="URL">
+      <p class="text-warning">Please enter 'N/A' if there is no URL</p>
+      <p class="text-warning">Please make sure the URL starts with 'http://' or 'https://' (If there is a URL)</p>
+      <p class="text-danger url-warn"></p>
+      <br>
+      <label for="description">Description</label>
+      <textarea class="form-control description" id="description" rows="3"></textarea>
+      <p class="text-danger description-warn"></p>
+      <br>
+      <div class="custom-control custom-checkbox">
+      <input type="checkbox" class="custom-control-input graded" id="customCheck1">
+      <label class="custom-control-label" for="customCheck1">Graded</label>
+      </div>
+      <br>
+      <label class="mt-3" for="customRange3">Priority</label>
+      <input type="range" class="custom-range priority" min="1" max="5" step="1" id="customRange3">
+      <br>
+      <br>
+      <button type="submit" class="btn btn-primary add" style="width: 100%;">Create</button>
+      </div>
+    </script>
+
+    <script id="event-create-form" type="text/x-handlebars-template">
+      <div class="question-set">
+      <label for="class">Which class</label>
+      <select class="custom-select class-select" name="class-select">
+      <option selected value="">Select an class</option>
+      </select>
+      <p class="text-danger class-warn"></p>
+      <br>
+      <label for="name">Name of Event</label>
+      <input class="form-control name" id="name" type="text" placeholder="Name of Event">
+      <p class="text-danger name-warn"></p>
+      <br>
+      <label for="deadline">Start</label>
+      <input type="date" class="form-control deadline-start" name="deadline-end" style="width: 100%;">
+      <br><br>
+      <input type="time" class="form-control deadline1-start" name="deadline1-end" style="width: 100%;">
+      <p class="text-danger deadline-start-warn"></p>
+      <br>
+      <label for="deadline">End</label>
+      <input type="date" class="form-control deadline-end" name="deadline-end" style="width: 100%;">
+      <br><br>
+      <input type="time" class="form-control deadline1-end" name="deadline1-end" style="width: 100%;">
+      <p class="text-danger deadline-end-warn"></p>
+      <br>
+      <label for="description">Description</label>
+      <textarea class="form-control description" id="description" rows="3"></textarea>
+      <p class="text-danger description-warn"></p>
+      <br>
+      <button type="submit" class="btn btn-primary add" style="width: 100%;">Create</button>
+      </div>
+    </script>
+
+    <script id="org-event-create-form" type="text/x-handlebars-template">
+      <div class="question-set">
+      <label for="name">Name of Event</label>
+      <input class="form-control name" id="name" type="text" placeholder="Name of Event">
+      <p class="text-danger name-warn"></p>
+      <br>
+      <label for="deadline">Start</label>
+      <input type="date" class="form-control deadline-start" name="deadline-end" style="width: 100%;">
+      <br><br>
+      <input type="time" class="form-control deadline1-start" name="deadline1-end" style="width: 100%;">
+      <p class="text-danger deadline-start-warn"></p>
+      <br>
+      <label for="deadline">End</label>
+      <input type="date" class="form-control deadline-end" name="deadline-end" style="width: 100%;">
+      <br><br>
+      <input type="time" class="form-control deadline1-end" name="deadline1-end" style="width: 100%;">
+      <p class="text-danger deadline-end-warn"></p>
+      <br>
+      <label for="description">Description</label>
+      <textarea class="form-control description" id="description" rows="3"></textarea>
+      <p class="text-danger description-warn"></p>
+      <br>
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input holiday" id="customCheck1">
+        <label class="custom-control-label" for="customCheck1">Holiday</label>
+        </div>
+      <br>
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input spec-sch" id="customCheck2">
+        <label class="custom-control-label" for="customCheck2">Special Schedule</label>
+        </div>
+      <br>
+      <button type="submit" class="btn btn-primary add" style="width: 100%;">Create</button>
+      </div>
+    </script>
+  {% endif %}
+
   <script>
     const calendar_item = Handlebars.compile(document.querySelector("#calendar-item").innerHTML)
     const class_name = Handlebars.compile(document.querySelector("#class-name").innerHTML)
+    const enroll_code_prompt = Handlebars.compile(document.querySelector("#enroll-code-prompt").innerHTML)
+    const enroll_confirm = Handlebars.compile(document.querySelector("#enroll-confirm").innerHTML)
+    const timetable_template = Handlebars.compile(document.querySelector("#timetable-template").innerHTML)
+    const timetable_print_style = Handlebars.compile(document.querySelector("#timetable-print-style").innerHTML)
+    const assignment_create_form = Handlebars.compile(document.querySelector("#assignment-create-form").innerHTML)
+    const event_create_form = Handlebars.compile(document.querySelector("#event-create-form").innerHTML)
+    const org_event_create_form = Handlebars.compile(document.querySelector("#org-event-create-form").innerHTML)
 
     const d_ = new Date()
     var m = d_.getMonth()
@@ -45,6 +209,8 @@
         }
       })
 
+      add_btn()
+
       populate_calendar(m)
 
       timetable()
@@ -53,9 +219,57 @@
       window.addEventListener('resize', change_height)
     })
 
+    {% if request.user.teacher %}
+      function add_btn() {
+        document.querySelectorAll('.date-picker').forEach(dp => {
+          dp.innerHTML += `<span class="badge badge-light add-on-day-btn" data-toggle="modal" data-target="#modal" onclick="add_on_date(this)">+</span>`
+        })
+      }
+      
+      function add_on_date(e) {
+        document.querySelector('.modal-title').innerHTML = "Add on " + e.parentElement.dataset.date + " " + months[e.parentElement.dataset.month - 1]
+        document.querySelector('.modal-body').innerHTML = `
+          <center>
+            <div class="btn-group-vertical" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-secondary add-this-on-day-btn" onclick="add_this_on_day(this, ${e.parentElement.dataset.date}, ${e.parentElement.dataset.month}, ${e.parentElement.dataset.year})" data-type="assignment">Assignment</button>
+            <button type="button" class="btn btn-secondary add-this-on-day-btn" onclick="add_this_on_day(this, ${e.parentElement.dataset.date}, ${e.parentElement.dataset.month}, ${e.parentElement.dataset.year})" data-type="event">Event (Only for one class)</button>
+            <button type="button" class="btn btn-secondary add-this-on-day-btn" onclick="add_this_on_day(this, ${e.parentElement.dataset.date}, ${e.parentElement.dataset.month}, ${e.parentElement.dataset.year})" data-type="org-event">Schoolwide Event</button>
+            </div>
+          </center>
+        `
+      }
+
+      function add_this_on_day(e, date_, month_, year_) {
+        if (e.dataset.type == "assignment") {
+          document.querySelector('.modal-title').innerHTML = "Add Assignment"
+          document.querySelector('.modal-body').innerHTML = assignment_create_form()
+
+          for(i = 0; i < data["class"].length; i++) {
+            document.querySelector('.class-select').innerHTML += `<option value="${data["class"][i]["id"]}">${data["class"][i]["name"]}</option>`
+          }
+          document.querySelector('.deadline').value = year_.toString() + "-" + month_.toString().padStart(2, "0") + "-" + date_.toString().padStart(2, "0")
+        }
+
+        else if (e.dataset.type == "event") {
+          document.querySelector('.modal-title').innerHTML = "Add Event"
+          document.querySelector('.modal-body').innerHTML = event_create_form()
+        }
+
+        else if (e.dataset.type == "org-event") {
+          document.querySelector('.modal-title').innerHTML = "Add School-Wide Event"
+          document.querySelector('.modal-body').innerHTML = org_event_create_form()
+        }
+      }
+    {% endif %}
+
     function change_height() {
       document.querySelector('.sidebar').style.height = (window.innerHeight - 104).toString() + "px"
-      document.querySelector('.wrapper').style.height = (window.innerHeight - 104).toString() + "px"
+      rowcount = document.querySelector('#calendar-body').childElementCount.toString()
+      tableheight = document.querySelector('#calendar-body').offsetHeight
+      document.querySelectorAll('.date-picker').forEach(dp => {
+        dp.style.height = (tableheight / rowcount).toString() + "px"
+      })
+      //document.querySelector('.wrapper').style.height = (window.innerHeight - 104).toString() + "px"
 
       //dph = Math.floor((document.querySelector('#calendar-body').offsetHeight) / (document.querySelector('#calendar-body').querySelectorAll('tr').length))
 
@@ -67,14 +281,7 @@
     function printDiv(elementId) {
       data = document.getElementById(elementId).innerHTML;
       window.frames["print_frame"].document.title = document.title;
-      window.frames["print_frame"].document.body.innerHTML = `<style>
-        .timetable{font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;width: 100%;border-collapse: separate;border-spacing: 3px;}
-        .timetable td, .timetable th {border: 1px solid #ddd;padding: 8px;margin: 8px;}
-        .timetable tr:nth-child(even){background-color: #f2f2f2;}
-        .timetable th:nth-child(1){max-width: 30px;}
-        .timetable td:nth-child(1){max-width: 30px;}
-        .timetable th {padding-top: 12px;padding-bottom: 12px;text-align: left;}
-      </style>` + data;
+      window.frames["print_frame"].document.body.innerHTML = timetable_print_style() + data;
       window.frames["print_frame"].window.focus();
       window.frames["print_frame"].window.print();
     }
@@ -83,20 +290,7 @@
       document.querySelector('.timetable-btn').onclick = () => {
         setTimeout(function() {
           document.querySelector('.big-modal-title').innerHTML = "Student Timetable"
-          document.querySelector('.big-modal-body').innerHTML = `
-            <div id="timetable-printable">
-              <table class="timetable">
-                <thead class="timetable-head">
-                  <tr class="timetable-head-row"></tr>
-                </thead>
-                <tbody class="timetable-body">
-                </tbody>
-              </table>
-            </div>
-            <button type="button" class="btn btn-link" onclick="printDiv('timetable-printable')">
-              Print Timetable
-            </button>
-          `
+          document.querySelector('.big-modal-body').innerHTML = timetable_template()
 
           document.querySelector('.timetable-head-row').innerHTML += "<th>Period</th>"
           for (i = 0; i < data["days"].length; i++) {
@@ -133,15 +327,7 @@
       document.querySelector('.enroll-btn').onclick = () => {
         setTimeout(function() {
           document.querySelector('.modal-title').innerHTML = "Enroll in a Class"
-          document.querySelector('.modal-body').innerHTML = `
-            <div class="input-group">
-              <input type="text" class="form-control enroll-code" placeholder="Enroll Code" aria-label="" aria-describedby="basic-addon1">
-              <div class="input-group-append">
-                <button class="btn btn-primary enroll-btn-1" type="button">Enroll</button>
-              </div>
-            </div>
-            <p class="text-danger enroll-warn"></p>
-          `
+          document.querySelector('.modal-body').innerHTML = enroll_code_prompt()
           document.querySelector('.enroll-btn-1').onclick = () => {
             enrollCode = document.querySelector('.enroll-code').value
             if (enrollCode == "") {
@@ -157,15 +343,7 @@
                   document.querySelector('.enroll-warn').innerHTML = res["data"]
                 }
                 else {
-                  document.querySelector('.modal-body').innerHTML = `
-                    <center><h4>Enroll?</h4></center>
-                    <p>Class name: ${res["data"]["name"]}</p>
-                    <p>Teacher: ${res["data"]["teacher"]}</p>
-                    <button type="submit" class="btn btn-success enroll-confirm-btn" style="width: 100%;">Enroll</button>
-                    <br><br>
-                    <a href="{% url 'index' %}"><button type="submit" class="btn btn-danger" style="width: 100%;" data-dismiss="modal">Don't Enroll</button></a>
-                    <strong><p class="text-warning">WARNING: Do NOT enroll in a class that you are not really in.</p></strong>
-                  `
+                  document.querySelector('.modal-body').innerHTML = enroll_confirm({"name": res["data"]["name"], "teacher": res["data"]["teacher"]})
                   document.querySelector('.enroll-confirm-btn').onclick = () => {
                     r = new XMLHttpRequest()
                     r.open("POST", "{% url 'enroll' %}?code=" + enrollCode)
@@ -243,6 +421,7 @@
     function populate_calendar(time) {
       // Add assignments to calendar
 
+
       r = new XMLHttpRequest()
       r.open("GET", "{% url 'data' %}?timespan=month&time=" + time)
       r.onload = () => {
@@ -265,7 +444,6 @@
             td = new Date(dp.dataset.year, dp.dataset.month - 1, dp.dataset.date)
             if (sd.toDateString() <= td.toDateString() && td.toDateString() <= ed.toDateString())
             {
-              dp.innerHTML += '<br>'
               var ci = calendar_item({'class': e[i]['class'], 'i': i, 'type': "event", 'color': "cornflowerblue", 'text': e[i]['name']})
               dp.innerHTML += ci
             }
@@ -281,7 +459,6 @@
             td = new Date(dp.dataset.year, dp.dataset.month - 1, dp.dataset.date)
             if (sd.toDateString() <= td.toDateString() && td.toDateString() <= ed.toDateString())
             {
-              dp.innerHTML += '<br>'
               var ci = calendar_item({'class': oe[i]['class'], 'i': i, 'type': "org_event", 'color': "green", 'text': oe[i]['name']})
               dp.innerHTML += ci
               if (oe[i]['holiday'] == true) {
@@ -299,7 +476,6 @@
             td = new Date(dp.dataset.year, dp.dataset.month - 1, dp.dataset.date)
             if (d.toDateString() == td.toDateString())
             {
-              dp.innerHTML += '<br>'
               var ci = calendar_item({'class': a[i]['class'], 'i': i, 'type': "assignment", 'color': "black", 'text': a[i]['name'] + " [" + a[i]['class']['name'] + "]"})
               dp.innerHTML += ci
             }
@@ -351,6 +527,8 @@
         })
 
         add_click_listener_to_dates()
+
+        add_btn()
       }
       r.send()
     }
@@ -431,20 +609,6 @@
       </div>
     </div>
   </div>
-<!--
-  <center>
-    This ad helps pay for website hosting.
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-9448514087614457"
-        data-ad-slot="1160288522"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </center>-->
 
   <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">

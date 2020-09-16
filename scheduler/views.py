@@ -23,20 +23,23 @@ def get_data(request):
     classes = request.user.class_student.all()
     context["data"]["class"] = [i.getinfo() for i in classes]
     assignments1 = []
-    for class_ in classes:
-        if timespan == "month":
-            if time == None:
-                assignments = Assignment.objects.filter(Class=class_, deadline__month=(datetime.datetime.now().month))
-            else:
-                assignments = Assignment.objects.filter(Class=class_, deadline__month=int(time) + 1)
-        elif timespan == "day":
-            if time == None:
-                assignments = Assignment.objects.filter(Class=class_, deadline__date=datetime.datetime.now().date)
-            else:
-                assignments = Assignment.objects.filter(Class=class_, deadline__date=time)
-        for i in assignments:
-            assignments1.append(i)
-    events = Event.objects.filter(Class=class_)
+    assignments = []
+    events = []
+    if len(classes) > 0:
+        for class_ in classes:
+            if timespan == "month":
+                if time == None:
+                    assignments = Assignment.objects.filter(Class=class_, deadline__month=(datetime.datetime.now().month))
+                else:
+                    assignments = Assignment.objects.filter(Class=class_, deadline__month=int(time) + 1)
+            elif timespan == "day":
+                if time == None:
+                    assignments = Assignment.objects.filter(Class=class_, deadline__date=datetime.datetime.now().date)
+                else:
+                    assignments = Assignment.objects.filter(Class=class_, deadline__date=time)
+            for i in assignments:
+                assignments1.append(i)
+        events = Event.objects.filter(Class=class_)
     org_events = Org_Event.objects.filter()
 
     context["data"]["assignments"] = [i.getinfo() for i in assignments1]
@@ -144,6 +147,11 @@ def class_(request):
         else:
             return HttpResponse("Only teachers are allowed to access this")
 """
+
+@login_required(login_url="login/")
+def settings(request):
+    return HttpResponse("ERROR: Not yet implemented!")
+    #return render(request, "scheduler/settings.html")
 
 def calendar(request):
     context = {

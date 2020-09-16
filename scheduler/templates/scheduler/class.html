@@ -5,6 +5,8 @@
 
 {% block script %}
     <script>
+		var data
+
 		document.addEventListener('DOMContentLoaded', () => {
 			data = JSON.parse("{{ data }}".replace(/&#x27;/g,'"'))
 			console.log(data)

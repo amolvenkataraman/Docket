@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'scheduler.apps.SchedulerConfig',
     'chat.apps.ChatConfig',
     'map.apps.MapConfig',
+    'stats.apps.StatsConfig',
     'crispy_forms',
     'reset_migrations',
     'django.contrib.admin',

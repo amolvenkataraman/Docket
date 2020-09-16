@@ -22,6 +22,7 @@ urlpatterns = [
     path("", include("scheduler.urls")),
     #path("chat/", include("chat.urls")),
     path("map/", include("map.urls")),
+    path("stats/", include("stats.urls")),
     path("register/", user_views.register_view, name='register'),
     path("login/", user_views.login_view, name="login"),
     path("logout/", user_views.logout_view, name='logout'),
