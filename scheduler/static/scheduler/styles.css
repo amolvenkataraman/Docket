@@ -86,7 +86,7 @@
 
 .sidebar {
   width: 15%;
-  height: 100%;
+  height: calc(100vh - 56px - 48px);
   margin: 0px;
   padding: 10px;
   background: #f8f9fa;
@@ -131,4 +131,12 @@
 
 .settings-select {
   width: 250px;
+}
+
+.sticky-bottom {
+  bottom: 0;
+}
+
+.day-schedule-div {
+  width: 30%;
 }

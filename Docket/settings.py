@@ -34,8 +34,11 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'scheduler.apps.SchedulerConfig',
     'chat.apps.ChatConfig',
+    'videochat.apps.VideochatConfig',
     'map.apps.MapConfig',
     'stats.apps.StatsConfig',
+    'home.apps.HomeConfig',
+    
     'crispy_forms',
     'reset_migrations',
     'django.contrib.admin',

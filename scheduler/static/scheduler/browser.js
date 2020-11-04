@@ -1,7 +1,7 @@
 var parser = new UAParser()
 var oldbrowsers = ['Amaya', 'AOL Explorer', 'Arora', 'Camino', 'ELinks', 'Flock', 'Galeon', 'IE', 'IEMobile', 'K-Meleon', 'Lunascape', 'Mosaic', 'Mozilla Application Suite',
 'Netscape', 'NokiaBrowser', 'Omniweb', 'Origyn', 'rekonq', 'Shiira', 'surf', 'Uzbl', 'WorldWideWeb', 'Nexus']
-var goodbrowsers = ['Android Browser', 'Brave', 'Chrome', 'Chromium', 'Firefox', 'Opera', 'Safari', 'Samsung Browser', 'Waterfox']
+var goodbrowsers = ['Android Browser', 'Brave', 'Chrome', 'Chromium', 'Edge', 'Firefox', 'Opera', 'Safari', 'Samsung Browser', 'Waterfox']
 
 document.addEventListener('DOMContentLoaded', () => {
     data__ = parser.getResult()

@@ -56,7 +56,7 @@ class Class(models.Model):
     name = models.CharField(max_length=64, unique=True)
     teacher = models.ForeignKey(DocketUser, on_delete=models.SET("DELETED_USER"), related_name='class_teacher')
     students = models.ManyToManyField(DocketUser, related_name='class_student')
-    room = models.ForeignKey(Room, on_delete=models.SET("DELETED ROOM"), related_name='class_room')
+    room = models.ForeignKey(Room, on_delete=models.SET("DELETED ROOM"), related_name='class_room', null=True)
     period = models.ManyToManyField(Period, related_name='class_period')
     active = models.BooleanField(default=True)
 
@@ -68,10 +68,15 @@ class Class(models.Model):
             "id": self.id,
             "name": self.name,
             "teacher": self.teacher.getinfo(),
-            "room": self.room.getinfo(),
             "period": [i.getinfo() for i in self.period.all()],
+            "students": [i.getinfo() for i in self.students.all()],
             "active": str(self.active),
         }
+
+        try:
+            ans["room"] = self.room.getinfo()
+        except AttributeError:
+            print("", end="")
 
         for i in self.period.all():
             ans["period"].append(i.getinfo())
@@ -87,7 +92,9 @@ class Group(models.Model):
 
 class Invite(models.Model):
     Class = models.ForeignKey(Class, on_delete=models.CASCADE)
-    code = models.CharField(max_length=8)
+    code = models.CharField(max_length=8, unique=True)
+    uses = models.IntegerField(default=0)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.code}, for {self.Class.name}"
@@ -97,6 +104,8 @@ class Invite(models.Model):
             "id": self.id,
             "class": self.Class.getinfo(),
             "code": self.code,
+            "uses": self.uses,
+            "active": str(self.active),
         }
         return ans
 
@@ -155,6 +164,8 @@ class Org_Event(models.Model):
     description = models.TextField()
     specialschedule = models.BooleanField(default=False)
     holiday = models.BooleanField(default=False)
+    sync_from = models.CharField(max_length=32, null=True, default="")
+    sync_id = models.CharField(max_length=128, null=True, default="")
     
     def __str__(self):
         return f"{self.name}. From {str(self.startdate)} to {str(self.enddate)}"
@@ -171,9 +182,9 @@ class Org_Event(models.Model):
         }
         return ans
 
-class Board(models.Model):
+class Whiteboard(models.Model):
     Class = models.ForeignKey(Class, on_delete=models.SET('DELETED_CLASS'))
     date_time = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=256)
     description = models.TextField()
-    img = models.ImageField(upload_to='boards', null=True)
+    img = models.ImageField(upload_to='whiteboards', null=True)

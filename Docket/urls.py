@@ -19,12 +19,17 @@ from users import views as user_views
 
 # URL patterns for main app
 urlpatterns = [
-    path("", include("scheduler.urls")),
-    #path("chat/", include("chat.urls")),
+    path("calendar/", include("scheduler.urls")),
+    path("chat/", include("chat.urls")),
+    #path("videochat/", include("videochat.urls")),
     path("map/", include("map.urls")),
     path("stats/", include("stats.urls")),
+    #path("home/", include("home.urls")),
+
     path("register/", user_views.register_view, name='register'),
     path("login/", user_views.login_view, name="login"),
     path("logout/", user_views.logout_view, name='logout'),
+    path("profile_picture/", user_views.profile_picture, name='profile_picture'),
+
     path("admin/", admin.site.urls),
 ]

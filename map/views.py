@@ -8,7 +8,7 @@ import json
 import PIL
 
 # Create your views here.
-@login_required(login_url="login/")
+@login_required(login_url="/login")
 def map(request):
     context = {
         "venues": [i.getinfo() for i in Venue.objects.all()],
@@ -22,7 +22,7 @@ def map(request):
 
     return render(request, 'map/map.html', {"data": context})
 
-@login_required(login_url="login/")
+@login_required(login_url="/login")
 def map_image(request):
     venue_id = request.GET.get("venue_id")
     floor = request.GET.get("floor")
@@ -38,7 +38,7 @@ def map_image(request):
             width, height = image.size
             return JsonResponse({"width": width, "height": height})
 
-@login_required(login_url="login/")
+@login_required(login_url="/login")
 def add(request):
     if request.method == 'POST':
         info = json.loads(request.body)

@@ -2,7 +2,7 @@
   position: absolute;
   right: 0;
   width: 85%;
-  height: calc(100vh - 56px - 48px);
+  height: calc(100vh - 56px);
   overflow: auto;
   display: flex;
   flex-flow: column;

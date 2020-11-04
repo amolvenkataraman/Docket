@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -16,7 +16,6 @@ def register_view(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for \'{username}\'. Please log in now')
             return redirect('login')
     else:
         form = UserRegisterForm()
@@ -30,7 +29,6 @@ def login_view(request):
         if form.is_valid():
             username = form.get_user()
             login(request, username)
-            messages.success(request, f'Successfully logged in as \'{username}\'')
             if 'next' in request.POST:
                 return redirect(request.POST.get('next'))
             else:
@@ -45,5 +43,10 @@ def login_view(request):
 def logout_view(request):
     if request.method == 'POST':
         logout(request)
-        messages.success(request, f'Successfully logged out')
         return redirect('login')
+
+def profile_picture(request):
+    user_id = request.GET.get("user_id")
+    if user_id != None:
+        user = DocketUser.objects.filter(id=user_id)[0]
+        return FileResponse(user.profile_picture)

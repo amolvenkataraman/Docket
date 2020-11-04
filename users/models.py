@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 class DocketUser(AbstractUser):
     email = models.EmailField('Email address', unique=True)
+    profile_picture = models.ImageField(upload_to="profile_pictures", null=True, blank=True)
     parent = models.BooleanField(default=False)
     teacher = models.BooleanField(default=False)
     newuser = models.BooleanField(default=True)
@@ -25,5 +26,10 @@ class DocketUser(AbstractUser):
             "teacher": str(self.teacher),
             "newuser": str(self.newuser),
         }
+
+        try:
+            ans["profile_picture"] = self.profile_picture.url
+        except ValueError:
+            print("", end="")
 
         return ans

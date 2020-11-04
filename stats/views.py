@@ -24,5 +24,18 @@ def store_data(request):
     if client_data["touch_points"] != "undefined":
         _.touch_points = client_data["touch_points"]
 
+    if client_data["totsw"] != "undefined":
+        _.total_sw = client_data["totsw"]
+    if client_data["totsh"] != "undefined":
+        _.total_sh = client_data["totsh"]
+    if client_data["avsw"] != "undefined":
+        _.avail_sw = client_data["avsw"]
+    if client_data["avsh"] != "undefined":
+        _.avail_sh = client_data["avsh"]
+    if client_data["coldpth"] != "undefined":
+        _.col_depth = client_data["coldpth"]
+    if client_data["colres"] != "undefined":
+        _.col_res = client_data["colres"]
+
     _.save()
     return HttpResponse("Saved")

@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+	Chat
+{% endblock %}
+
+{% block script %}
+	<script id="channel-btn-new" type="text/x-handlebars-template">
+		{% verbatim %}
+			<button type="button" class="btn btn-outline-secondary channel" name="channel" data-channel="{{ value }}">#{{ value }}</button>
+		{% endverbatim %}
+	</script>
+
+	<script id="message" type="text/x-handlebars-template">
+		{% verbatim %}
+			<div class="message" data-message="{{ message }}" data-user={{ username }} data-time="{{ time }}">
+				<font face="verdana" color="blue" style="font-size: 12px">{{ username }}</font>
+				<font face="verdana" color="gray" style="font-size: 10px">{{ time }}</font>
+				<br>
+				<font face="helvetica" color="black" style="font-size: 16px">{{ message }}</font>
+			</div>
+			<hr>
+		{% endverbatim %}
+	</script>
+
+	<script id="my_message" type="text/x-handlebars-template">
+		{% verbatim %}
+			<div class="message" data-message="{{ message }}" data-user={{ username }} data-time="{{ time }}">
+				<font face="verdana" color="green" style="font-size: 12px">{{ username }}</font>
+				<font face="verdana" color="gray" style="font-size: 10px">{{ time }}</font>
+				<br>
+				<font face="helvetica" color="black" style="font-size: 16px">{{ message }}</font>
+				<button type="button" class="btn btn-outline-secondary delete-btn">Delete</button>
+				<hr>
+			</div>
+		{% endverbatim %}
+	</script>
+
+	<script id="del_message" type="text/x-handlebars-template">
+		{% verbatim %}
+			<div class="message" data-message="{{ message }}" data-user={{ username }} data-time="{{ time }}">
+				<font face="verdana" color="blue" style="font-size: 12px">{{ username }}</font>
+				<font face="verdana" color="gray" style="font-size: 10px">{{ time }}</font>
+				<br>
+				<font face="helvetica" color="gray" style="font-size: 16px">{{ message }}</font>
+				<hr>
+			</div>
+		{% endverbatim %}
+	</script>
+
+	<script>
+		// When to page loads
+		document.addEventListener('DOMContentLoaded', () => {
+
+			// Templates for Channel button and Messages
+			const channel_btn_template = Handlebars.compile(document.querySelector('#channel-btn-new').innerHTML);
+			const message = Handlebars.compile(document.querySelector('#message').innerHTML)
+			const my_message = Handlebars.compile(document.querySelector('#my_message').innerHTML)
+			const del_message = Handlebars.compile(document.querySelector('#del_message').innerHTML)
+
+			const username = document.querySelector('.user-dpdn').innerHTML;
+
+			// Initialize Socket
+			var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+			// Go to the last visited channel
+			if (!localStorage.getItem('channel'))
+			localStorage.setItem('channel', 'general');
+			const channel  = localStorage.getItem('channel');
+			var active_channel = channel;
+			console.log(channel);
+			var request = new XMLHttpRequest();
+			request.open('GET', `/ischannel?channel=${channel}`);
+			request.onload = () => {
+				if (request.responseText === "False") {
+					localStorage.setItem('channel', 'general');
+					active_channel = 'general';
+				}
+				else {
+					active_channel = channel;
+				}
+				document.querySelectorAll('.channel').forEach(button => {
+					if (button.dataset.channel === active_channel) {
+						button.classList = ("btn btn-secondary channel");
+					}
+				});
+			}
+			request.send();
+
+			load_messages(active_channel)
+
+			// When Socket connects
+			socket.on('connect', () => {
+				// Log then Socket is connected
+				console.log("Socket successfully connected");
+
+				// Wait for button click and emit
+				document.querySelector('.new-channel').onclick = () => {
+					const name = document.querySelector('.channel-name').value;
+					socket.emit('channel', {'channel': name});
+				};
+
+				document.querySelector('.send').onclick = () => {
+					const message = document.querySelector('.messagetext').value;
+					socket.emit('sendmessage', {'message': message, 'channel': active_channel, 'user': username});
+					document.querySelector('.messagetext').value = "";
+				};
+			});
+
+			// Load messages on user's screen
+			function load_messages(channel) {
+				var request = new XMLHttpRequest();
+				request.open('GET', `/getmessages?channel=${channel}`);
+				request.onload = () => {
+					const data = request.responseText;
+					var data1 = JSON.parse(data);
+					document.querySelector('.chat-area').innerHTML = "";
+					for (var i = 0; i < data1['data'].length; i++) {
+						if (data1['data'][i][0] === 'This message was deleted.') {
+							msg = del_message({'username': data1['data'][i][2], 'time': data1['data'][i][1], 'message': data1['data'][i][0]});
+						}
+						else {
+							if (data1['data'][i][2] === username) {
+								msg = my_message({'username': data1['data'][i][2], 'time': data1['data'][i][1], 'message': data1['data'][i][0]});
+							}
+							else {
+								msg = message({'username': data1['data'][i][2], 'time': data1['data'][i][1], 'message': data1['data'][i][0]});
+							}
+						}
+						document.querySelector('.chat-area').innerHTML += msg;
+					}
+					document.querySelectorAll('.delete-btn').forEach(button => {
+						button.onclick = () => {
+							delete_message(button);
+						};
+					});
+					chat_area = document.querySelector('.chat-area');
+					chat_area.scrollTop = chat_area.scrollHeight - chat_area.clientHeight;
+				}
+				request.send();
+			}
+
+			function delete_message(button) {
+				messagediv = button.parentElement;
+				messagetext = messagediv.dataset.message;
+				user = messagediv.dataset.user;
+				time = messagediv.dataset.time;
+				console.log("Delete message:");
+				console.log(messagetext);
+				socket.emit('delete', {'message': messagetext, 'time': time, 'user': user, 'channel': active_channel});
+			}
+
+			document.querySelectorAll('.delete-btn').forEach(button => {
+				button.onclick = () => {
+					delete_message(button);
+				};
+			});
+
+			// Make all the channel buttons clickable
+			document.querySelectorAll('.channel').forEach(button => {
+				button.onclick = () => {
+					document.querySelectorAll('.channel').forEach(button1 => {
+						button1.classList = ("btn btn-outline-secondary channel");
+					});
+					button.classList = ("btn btn-secondary channel");
+					active_channel = button.dataset.channel;
+					localStorage.setItem('channel', active_channel);
+					console.log(`Switched to channel: ${active_channel}`);
+					load_messages(active_channel);
+				};
+			});
+
+			// Disable Create Channel button on page load
+			document.querySelector('.new-channel').disabled = true;
+
+			// When something is typed on the channel name text box
+			document.querySelector('.channel-name').onkeyup = () => {
+				// Get value of text box
+				let name = document.querySelector('.channel-name').value;
+
+				// If there is some text in the text box
+				if (name.length > 0) {
+					// Enable the button and create a request (to check if the channel exists)
+					document.querySelector('.new-channel').disabled = false;
+					var request = new XMLHttpRequest();
+					request.open('GET', `/channel?name=${name}`);
+					// When the request is complete
+					request.onload = () => {
+						// Get request data
+						const data = request.responseText;
+						// If the channel already exists
+						if (data === "True") {
+							document.querySelector('#errorText').style.color = "red";
+							document.querySelector('#errorText').innerHTML = "Sorry, that channel exists.";
+							document.querySelector('.new-channel').disabled = true;
+						}
+						// If the channel does not exist
+						else {
+							document.querySelector('#errorText').style.color = "green";
+							document.querySelector('#errorText').innerHTML = "Name is not used.";
+							document.querySelector('.new-channel').disabled = false;
+						}
+					}
+					request.send();
+				}
+				// If the text box is empty
+				else
+				{
+					document.querySelector('#errorText').style.color = "#f39c12";
+					document.querySelector('#errorText').innerHTML = "Please enter a Channel Name.";
+					document.querySelector('.new-channel').disabled = true;
+				}
+			};
+
+			// Disable the send message button on page load
+			document.querySelector('.send').disabled = true;
+
+			// When something is typed on the message text box
+			document.querySelector('.messagetext').onkeyup = event => {
+				// Get value of text box
+				let name = document.querySelector('.messagetext').value;
+
+				// If there is some text in the text box
+				if (name.length > 0) {
+					document.querySelector('.send').disabled = false;
+					chat_area = document.querySelector('.chat-area');
+					chat_area.scrollTop = chat_area.scrollHeight - chat_area.clientHeight;
+					if (event.keyCode === 13) {
+						document.querySelector('.send').click();
+						document.querySelector('.send').disabled = true;
+					}
+				}
+				// If the text box is empty
+				else
+				{
+					document.querySelector('.send').disabled = true;
+				}
+			};
+
+			// Upload files
+			var upload_btn = document.querySelector(".upload-conf")
+			upload_btn.onclick = () => {
+				var upload_form = document.querySelector(".upload-form");
+				var form = new FormData(upload_form);
+				var request = new XMLHttpRequest();
+				request.open('POST', `/upload?username=${username}&channel=${active_channel}`)
+				request.send(form);
+			};
+
+			// When socket data is received
+			socket.on("add channel", data => {
+				// Get data and create a button for channel
+				var channel_name = data.channel;
+				const channel_btn = channel_btn_template({'value': channel_name});
+				document.querySelector('.channel-list').innerHTML += channel_btn;
+
+				// Enpty the text box
+				document.querySelector('#inputText').value = ""
+				document.querySelector('#errorText').style.color = "#f39c12";
+				document.querySelector('#errorText').innerHTML = "Please enter a Channel Name.";
+				document.querySelector('.new-channel').disabled = true;
+
+				// Make each button listen for clicks
+				document.querySelectorAll('.channel').forEach(button => {
+					button.onclick = () => {
+						document.querySelectorAll('.channel').forEach(button1 => {
+							button1.classList = ("btn btn-outline-secondary channel");
+						});
+						button.classList = ("btn btn-secondary channel");
+						active_channel = button.dataset.channel;
+						localStorage.setItem('channel', active_channel);
+						console.log(`Switched to channel: ${active_channel}`)
+						load_messages(active_channel);
+					};
+				});
+			});
+
+			socket.on("delete", data => {
+				load_messages(active_channel)
+			});
+
+			socket.on("message", data => {
+				if (data.channel === active_channel) {
+					var new_message;
+					if (data.user === username) {
+						new_message = my_message({'username': data.user, 'time': data.time, 'message': data.message});
+					}
+					else {
+						new_message = message({'username': data.user, 'time': data.time, 'message': data.message});
+					}
+					document.querySelector('.chat-area').innerHTML += new_message;
+					document.querySelectorAll('.delete-btn').forEach(button => {
+						button.onclick = () => {
+							delete_message(button);
+						};
+					});
+				}
+				chat_area = document.querySelector('.chat-area');
+				chat_area.scrollTop = chat_area.scrollHeight - chat_area.clientHeight;
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+	<link href="{% static 'chat/styles.css' %}" rel="stylesheet" media="all"/>
+
+	<div id="chat-main">
+		<div class="channels jumbotron">
+			<p>It's a bit lonely in here. Start a conversation with someone in the right pane.</p>
+		</div>
+
+		<div class="chat jumbotron">
+			<div class="chat-area">
+
+			</div>
+			<div class="send-message">
+				<button type="button" class="btn btn-outline-primary file" name="file" data-toggle="modal" data-target="#uploadmodal">Upload</button>
+				<input type="text" name="messagetext" id="messageText" class="form-control messagetext" placeholder="Type a message here..." required autofocus>
+				<button type="button" class="btn btn-primary send" name="send">Send</button>
+			</div>
+		</div>
+
+		<div class="friends jumbotron">
+			<!--<div class="btn-group-vertical" role="group" aria-label="User List">
+				{% for i in users %}
+					<button type="button" class="btn user-btn">{{ i.username }}</button>
+				{% endfor %}
+			</div>-->
+
+			<div id="accordion" role="tablist">
+				{% for i in users %}
+				<div class="card user-btn">
+					<div class="card-header user-btn" role="tab" id="heading{{ forloop.counter }}">
+						<h6 class="">
+							<a data-toggle="collapse" href="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}">
+								{{ i.username }}
+							</a>
+						</65>
+					</div>
+	
+					<div id="collapse{{ forloop.counter }}" class="collapse" role="tabpanel" aria-labelledby="heading{{ forloop.counter }}">
+					<div class="card-body">
+						Options will appear here
+					</div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		<!-- Modal for file upload -->
+		<div class="modal fade" id="uploadmodal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="uploadModalLabel">Upload a file</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+				<form class="upload-form">
+					<input class="btn upload-btn" type='file' name='file'>
+				</form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-primary upload-conf">Upload</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+{% endblock %}

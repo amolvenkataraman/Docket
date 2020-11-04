@@ -1,0 +1,131 @@
+html {
+  height: 100%;
+}
+body {
+  min-height: 100%;
+}
+
+.jumbotron {
+  border-radius: 0px;
+}
+
+#chat-main {
+  display: flex;
+  align-items: center;
+  height: 90vh;
+}
+
+#errorText {
+  margin-bottom: 10px;
+}
+
+.channels {
+  width: 12%;
+  height: 100%;
+  margin-bottom: 0px;
+  padding-left: 0px;
+  padding: 10px;
+}
+
+.chat {
+  width: 78%;
+  height: 100%;
+  background-color: #f3f3f3;
+  margin-bottom: 0px;
+  padding: 0%;
+}
+
+.friends {
+  width: 10vw;
+  height: 100%;
+  margin-bottom: 0px;
+  padding-right: 0px;
+  padding: 0px;
+}
+
+#accordion {
+  padding-top: 10px;
+}
+
+.user-btn {
+  border: 0px !important;
+  border-radius: 0px !important;
+  margin: 0px;
+  background-color: #e8ecef;
+}
+
+.card-header {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.card-body {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.new-channel {
+  width: 80%;
+  font-size: 14px;
+  margin: 2% 10% 0% 10%;
+}
+
+.channel-name {
+  width: 80%;
+  font-size: 14px;
+  margin: 8% 10% 3% 10%;
+}
+
+.channel-list {
+  overflow-y: scroll;
+  max-height: 70%;
+}
+
+.channel {
+  width: 70%;
+  margin: 3% 10% 3% 10%;
+}
+
+.user-dpdn {
+  margin: 10% 10% 0% 10%;
+  width: 80%;
+}
+
+.chat-area {
+  overflow-y: scroll;
+  width: 100%;
+  height: 94%;
+  padding: 10px 10px 10px 10px;
+}
+
+.send-message {
+  width: 100%;
+}
+
+.file {
+  float: left;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.messagetext {
+  float: left;
+  margin: 0px 5px 0px 5px;
+  width: 81%;
+}
+
+.send {
+  float: left;
+  width: 10%;
+  margin: 0px 5px 0px 5px;
+}
+
+.delete-btn {
+  float: right;
+  width: 7%;
+  margin: 5px 5px 5px 5px;
+}
+
+.upload-btn {
+  width: 100%
+}
