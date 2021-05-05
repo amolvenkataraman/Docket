@@ -3,7 +3,7 @@ from . import views
 
 # URL patterns for main app
 urlpatterns = [
-    path("", views.index, name='index'),
+    path("", views.index, name='calendar'),
     path("data/", views.get_data, name='data'),
     path("class/", views.class_, name='class_'),
     path("add/", views.add, name='add'),

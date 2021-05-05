@@ -177,8 +177,8 @@ class Org_Event(models.Model):
             "startdate": str(self.startdate),
             "enddate": str(self.enddate),
             "description": self.description,
-            "specialschedule": self.specialschedule,
-            "holiday": self.holiday,
+            "specialschedule": str(self.specialschedule),
+            "holiday": str(self.holiday),
         }
         return ans
 

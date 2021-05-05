@@ -53,25 +53,25 @@ def get_data(request):
 
 @login_required(login_url="/login")
 def class_(request):
-        if request.user.teacher == True:
-            if request.method == 'POST':
-                b = json.loads(request.body.decode('utf8'))
-                c = Class(name=b['name'])
-                c.teacher = request.user
-                c.save()
-                c.students.add(request.user)
+    if request.user.teacher == True:
+        if request.method == 'POST':
+            b = json.loads(request.body.decode('utf8'))
+            c = Class(name=b['name'])
+            c.teacher = request.user
+            c.save()
+            c.students.add(request.user)
 
-                for i in b['periods']:
-                    try:
-                        c.period.add(Period.objects.filter(
-                            day_id=int(i[0]),
-                            period_id=int(i[1])
-                        )[0])
-                    except IndexError:
-                        print("", end="")
-                return JsonResponse({"status": "success", "data": "OK"})
-        else:
-            return JsonResponse({"status": "error", "data": "Only teachers are allowed to access this.<br>Please contact me if you are a teacher and want administrative access."})
+            for i in b['periods']:
+                try:
+                    c.period.add(Period.objects.filter(
+                        day_id=int(i[0]),
+                        period_id=int(i[1])
+                    )[0])
+                except IndexError:
+                    print("", end="")
+            return JsonResponse({"status": "success", "data": "OK"})
+    else:
+        return JsonResponse({"status": "error", "data": "Only teachers are allowed to access this.<br>Please contact me if you are a teacher and want administrative access."})
 
 @login_required(login_url="/login")
 def add(request):

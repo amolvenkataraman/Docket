@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Home {% endblock %}
+
+{% block script %}
+    <script>
+        function startTime() {
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var s = today.getSeconds();
+
+            m = checkTime(m);
+            s = checkTime(s);
+            document.querySelector('.hour').innerHTML = h
+            document.querySelector('.minute').innerHTML = m
+            document.querySelector('.second').innerHTML = s
+
+            var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+            document.querySelector('.date').innerHTML = today.getDate() + " " + months[today.getMonth()] + " " + today.getFullYear();
+
+            var t = setTimeout(startTime, 500);
+        }
+        function checkTime(i) {
+            if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+            return i;
+        }
+
+        function showCalendarEvents() {
+            data = JSON.parse("{{ data }}".replace(/&#x27;/g,'"'))
+            console.log(data)
+            currday = 0
+            for (i=0; i<data["org_events"].length; i++) {
+                if(new Date(data["org_events"][i]["startdate"]).setHours(0,0,0,0) == new Date().setHours(0,0,0,0)) {
+                    currday = parseInt(data["org_events"][i]["name"].split(" ")[1])
+                }
+                document.querySelector('.upcoming').innerHTML += `${data["org_events"][i]["name"]} ${new Date(data["org_events"][i]["startdate"]).toDateString()}<br>`
+            }
+
+            timetable(currday)
+        }
+
+        function timetable(day) {
+            for (i = 0; i < data["slots"].length; i++) {
+                document.querySelector('.timetable-body').innerHTML += `<tr class="timetable-row timetable-row-${i}"></tr>`
+                currRow = document.querySelector(`.timetable-row-${i}`)
+                currRow.innerHTML += `<td>${data["slots"][i]["name"]}<br>${data["slots"][i]["start"]} - ${data["slots"][i]["end"]}</td>`
+
+                j = currday
+                currRow.innerHTML += `<td class=schedule-data-${j}></td>`
+                currData = currRow.querySelector(`.schedule-data-${j}`)
+
+                for (k = 0; k < data["class"].length; k++) {
+                    for (l = 0; l < data["class"][k]["period"].length; l++) {
+                        temp = data["class"][k]["period"][l]
+
+                        if (temp["day"]["id"] === data["days"][j]["id"] && temp["period"]["id"] === data["slots"][i]["id"]) {
+                            currData.innerHTML = `${data["class"][k]["name"]}<br>${data["class"][k]["teacher"]["first_name"]}`
+                        }
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            startTime()
+            showCalendarEvents()
+            
+        })
+    </script>
+
+{% endblock %}
+
+{% block body %}
+    <link href="{% static 'home/styles.css' %}" rel="stylesheet" media="all"/>
+
+    <div class="container">
+        <div class="row">
+            <div class="timetable col-md">
+                <div id="timetable-printable" class="day-schedule-div">
+                <table class="timetable day-schedule-timetable">
+                    <thead class="timetable-head">
+                        <tr class="timetable-head-row"></tr>
+                    </thead>
+                    <tbody class="timetable-body">
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+            <div class="clock col-auto">
+                <div class="container">
+                    <div class="row justify-content-center" style="font-size: 200px;">
+                        <div class="col-auto hour">
+                            00
+                        </div>
+                        <div class="col-auto">
+                            :
+                        </div>
+                        <div class="col-auto minute">
+                            00
+                        </div>
+                        <div class="col-auto">
+                            :
+                        </div>
+                        <div class="col-auto second">
+                            00
+                        </div>
+                    </div>
+                    <div class="row" style="font-size: 20px; text-align: center;">
+                        <div class="col-sm-auto date" style="display: block; margin-left: auto; margin-right: auto;">
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="upcoming col-auto">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Begin WeatherLink Fragment -->
+    <!--<iframe title="Environment Canada Weather" width="287px" height="191px" src="https://weather.gc.ca/wxlink/wxlink.html?cityCode=on-143&amp;lang=e" allowtransparency="true" frameborder="0"></iframe>-->
+    <!-- End WeatherLink Fragment -->
+{% endblock %}

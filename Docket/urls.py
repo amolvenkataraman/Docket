@@ -24,7 +24,7 @@ urlpatterns = [
     #path("videochat/", include("videochat.urls")),
     path("map/", include("map.urls")),
     path("stats/", include("stats.urls")),
-    #path("home/", include("home.urls")),
+    path("", include("home.urls")),
 
     path("register/", user_views.register_view, name='register'),
     path("login/", user_views.login_view, name="login"),

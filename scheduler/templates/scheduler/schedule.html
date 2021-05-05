@@ -347,7 +347,7 @@
               }
               
               var request = new XMLHttpRequest()
-              request.open('POST', `/add/`)
+              request.open('POST', `{% url 'add' %}`)
               request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
               request.onload = () => {
                   if (request.responseText === "OK")
@@ -409,7 +409,7 @@
               }
               
               var request = new XMLHttpRequest()
-              request.open('POST', `/add/`)
+              request.open('POST', `{% url 'add' %}`)
               request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
               request.onload = () => {
                   if (request.responseText === "OK")
@@ -468,7 +468,7 @@
               }
               
               var request = new XMLHttpRequest()
-              request.open('POST', `/add/`)
+              request.open('POST', `{% url 'add' %}`)
               request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
               request.onload = () => {
                   if (request.responseText === "OK")
@@ -748,7 +748,7 @@
             })
 
             var request = new XMLHttpRequest()
-            request.open('POST', `/class/`)
+            request.open('POST', `{% url 'class_' %}`)
             request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
             request.onload = () => {
               res = JSON.parse(request.responseText)
@@ -1114,7 +1114,7 @@
             $('.invite-warn').html("")
 
             var request = new XMLHttpRequest()
-            request.open('POST', `/invite/?code=${document.querySelector('.invite-text').value}&class=${class_["id"]}&option=create`)
+            request.open('POST', `{% url 'invite' %}?code=${document.querySelector('.invite-text').value}&class=${class_["id"]}&option=create`)
             request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
             request.onload = () => {
               res = JSON.parse(request.responseText)
@@ -1144,7 +1144,7 @@
 
     function toggleInvite(cb) {
       var request = new XMLHttpRequest()
-      request.open('POST', `/invite/?code=${cb.dataset.invite}&option=active`)
+      request.open('POST', `{% url 'invite' %}?code=${cb.dataset.invite}&option=active`)
       request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
       request.onload = () => {
         res = JSON.parse(request.responseText)
