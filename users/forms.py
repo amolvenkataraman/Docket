@@ -10,4 +10,4 @@ class UserRegisterForm(UserCreationForm):
     # Add email first name and last name
     class Meta:
         model = DocketUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email', 'school', 'grade', 'password1', 'password2']

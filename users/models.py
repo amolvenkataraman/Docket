@@ -5,6 +5,8 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 class DocketUser(AbstractUser):
     email = models.EmailField('Email address', unique=True)
+    school = models.CharField(max_length=64)
+    grade = models.IntegerField()
     profile_picture = models.ImageField(upload_to="profile_pictures", null=True, blank=True)
     parent = models.BooleanField(default=False)
     teacher = models.BooleanField(default=False)

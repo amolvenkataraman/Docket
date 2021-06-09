@@ -68,7 +68,7 @@ def class_(request):
                         period_id=int(i[1])
                     )[0])
                 except IndexError:
-                    print("", end="")
+                    pass
             return JsonResponse({"status": "success", "data": "OK"})
     else:
         return JsonResponse({"status": "error", "data": "Only teachers are allowed to access this.<br>Please contact me if you are a teacher and want administrative access."})
@@ -120,7 +120,7 @@ def add(request):
 def edit(request):
     if request.user.teacher == True:
         if request.method == 'POST':
-            print("lol")
+            pass
     else:
         return HttpResponse('Only teachers are allowed to access this.<br>Please contact me if you are a teacher and want administrative access.')
 
@@ -128,7 +128,7 @@ def edit(request):
 def delete(request):
     if request.user.teacher == True:
         if request.method == 'POST':
-            print("lol")
+            pass
     else:
         return HttpResponse('Only teachers are allowed to access this.<br>Please contact me if you are a teacher and want administrative access.')
 
@@ -236,7 +236,7 @@ def add_from_gc(request):
 
         r = requests.get(f"https://www.googleapis.com/calendar/v3/calendars/{calendar_id}/events?key={api_key}&timeMin={start_time}&timeMax={end_time}")
         res = r.json()
-        print(res["summary"])
+        print(res)
         for i in res["items"]:
             _ = Org_Event(
                 name=i["summary"],

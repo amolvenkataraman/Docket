@@ -10,7 +10,7 @@ class DUAdmin(UserAdmin):
     
     fieldsets = UserAdmin.fieldsets + (
         ("Other", {
-            'fields': ('profile_picture', 'parent', 'teacher', 'newuser',),
+            'fields': ('profile_picture', 'school', 'grade',  'parent', 'teacher', 'newuser',),
         }),
     )
     #fieldsets = UserAdmin.fieldsets

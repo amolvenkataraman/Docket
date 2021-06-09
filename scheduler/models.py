@@ -76,7 +76,7 @@ class Class(models.Model):
         try:
             ans["room"] = self.room.getinfo()
         except AttributeError:
-            print("", end="")
+            pass
 
         for i in self.period.all():
             ans["period"].append(i.getinfo())

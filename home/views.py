@@ -1,17 +1,17 @@
 from django.shortcuts import render
 from scheduler.models import *
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 import datetime
 
 # Create your views here.
+@login_required(login_url="/login")
 def index(request):
     context = {"data": {}}
 
     starttime = datetime.datetime.now().date()
     endtime = (starttime + datetime.timedelta(days=7))
-    print(starttime)
-    print(endtime)
 
     classes = request.user.class_student.all()
     context["data"]["class"] = [i.getinfo() for i in classes]
@@ -32,5 +32,4 @@ def index(request):
     context["data"]["slots"] = [i.getinfo() for i in Slot.objects.all()]
     context["data"]["periods"] = [i.getinfo() for i in Period.objects.all()]
 
-    #print([i.getinfo() for i in Org_Event.objects.all()])
     return render(request, 'home/home.html', context)

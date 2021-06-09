@@ -28,45 +28,8 @@
             return i;
         }
 
-        function showCalendarEvents() {
-            data = JSON.parse("{{ data }}".replace(/&#x27;/g,'"'))
-            console.log(data)
-            currday = 0
-            for (i=0; i<data["org_events"].length; i++) {
-                if(new Date(data["org_events"][i]["startdate"]).setHours(0,0,0,0) == new Date().setHours(0,0,0,0)) {
-                    currday = parseInt(data["org_events"][i]["name"].split(" ")[1])
-                }
-                document.querySelector('.upcoming').innerHTML += `${data["org_events"][i]["name"]} ${new Date(data["org_events"][i]["startdate"]).toDateString()}<br>`
-            }
-
-            timetable(currday)
-        }
-
-        function timetable(day) {
-            for (i = 0; i < data["slots"].length; i++) {
-                document.querySelector('.timetable-body').innerHTML += `<tr class="timetable-row timetable-row-${i}"></tr>`
-                currRow = document.querySelector(`.timetable-row-${i}`)
-                currRow.innerHTML += `<td>${data["slots"][i]["name"]}<br>${data["slots"][i]["start"]} - ${data["slots"][i]["end"]}</td>`
-
-                j = currday
-                currRow.innerHTML += `<td class=schedule-data-${j}></td>`
-                currData = currRow.querySelector(`.schedule-data-${j}`)
-
-                for (k = 0; k < data["class"].length; k++) {
-                    for (l = 0; l < data["class"][k]["period"].length; l++) {
-                        temp = data["class"][k]["period"][l]
-
-                        if (temp["day"]["id"] === data["days"][j]["id"] && temp["period"]["id"] === data["slots"][i]["id"]) {
-                            currData.innerHTML = `${data["class"][k]["name"]}<br>${data["class"][k]["teacher"]["first_name"]}`
-                        }
-                    }
-                }
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             startTime()
-            showCalendarEvents()
             
         })
     </script>
@@ -79,15 +42,7 @@
     <div class="container">
         <div class="row">
             <div class="timetable col-md">
-                <div id="timetable-printable" class="day-schedule-div">
-                <table class="timetable day-schedule-timetable">
-                    <thead class="timetable-head">
-                        <tr class="timetable-head-row"></tr>
-                    </thead>
-                    <tbody class="timetable-body">
-                    </tbody>
-                </table>
-                </div>
+
             </div>
 
             <div class="clock col-auto">
@@ -117,14 +72,49 @@
                 </div>
             </div>
 
-            <div class="upcoming col-auto">
-                
+            <div class="timetable col-md">
+
             </div>
         </div>
     </div>
 
+    <div style="padding: 30px;">
+        <h1>Welcome!</h1>
 
-    <!-- Begin WeatherLink Fragment -->
-    <!--<iframe title="Environment Canada Weather" width="287px" height="191px" src="https://weather.gc.ca/wxlink/wxlink.html?cityCode=on-143&amp;lang=e" allowtransparency="true" frameborder="0"></iframe>-->
-    <!-- End WeatherLink Fragment -->
+        About a year ago, when the TDSB switched to online learning, there were many learning apps (Google Classroom, Brightspace, Zoom, Google Meet), which one had to check daily. As this was cumbersome, I created an app named <b>"Docket"</b>. It is a web-based calendar application that can collect data from all the school websites, programs and online learning platforms, and show them all in one place.
+        <br><br>
+        I showed the app to some teachers and principal of my school. The Principal forwarded it to TDSB. I was given an opportunity to walk through the app to the TDSB IT Department representatives. They liked the app and indicated that they may implement it in some form or another (either directly using my app or adding this functionality to the apps they already have).
+        <br><br>
+        I want to get feedback from students on Docket so that improvements can be made. You are free to play around with this demo. When you are done, please fill out <a href="https://forms.gle/S7TSFuce2ZYiTYUd8">this form</a> (you can also find the form link in the bottom right corner of the page).
+        <br><br>
+        <b>The main features of Docket are:</b>
+        <ul>
+            <li>One place to see all of your school-related assignments and events. There are also school-wide events.</li>
+            <li>Automatically generates timetable based on classes you are enrolled in. Displays your schedule for a certain day.</li>
+            <li>Saves time by reducing unnecessary work for both teachers and students.</li>
+            <li>Can sync up with existing platforms like Google Classroom and Brightspace (I can not demonstrate this here as everyone go to different schools). Assignments and events can directly link to these other platforms</li>
+            <li>This page (the home page) can work like a dashboard where teachers or students can see all their classes, assignmments and events as well as other useful information like weather and traffic conditions.</li>
+            <li>Can be used if studying online, in-school, or a mixture of both.</li>
+        </ul>
+        <b>Please click <a href="https://docs.google.com/document/d/1LfifcRuJMuYJf1NSjMbRtOSdCsKnX169OlWy3pKtq2g/edit?usp=sharing">here</a> for a guide on how to use the app (link can also be found at the bottom right corner of the page).</b>
+        <br><br>
+    </div>
+
+    <button class="site-info-modal-toggle" data-toggle="modal" data-target="#site-info-modal" style="display: none;"></button>
+    <div class="modal fade" id="site-info-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="site-info-modal-content modal-content">
+                <div class="site-info-modal-header modal-header">
+                    <h4>Hello There</h4>
+                </div>
+                <div class="site-info-modal-body modal-body">
+                </div>
+                <div class="site-info-modal-footer modal-footer">
+                    <button type="button" class="btn btn-success">Got It</button>
+                    <button type="button" class="btn btn-danger">Don't Show Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 {% endblock %}
