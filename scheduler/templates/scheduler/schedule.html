@@ -973,10 +973,10 @@
             Description: ${assignment["description"]}<br>
             `)
             if (assignment["graded"] == "True") {
-              document.querySelector('.modal-body').innerHTML += "This assignment is <b>GRADED</b>";
+              document.querySelector('.modal-body').innerHTML += "This assignment is <b>GRADED</b><br>";
             }
             else {
-              document.querySelector('.modal-body').innerHTML += "This assignment is <b>NOT GRADED</b>";
+              document.querySelector('.modal-body').innerHTML += "This assignment is <b>NOT GRADED</b><br>";
             }
             if (assignment["url"] != "N/A")
             {
