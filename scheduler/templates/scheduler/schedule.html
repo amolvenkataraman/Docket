@@ -971,7 +971,13 @@
               })
             }<br>
             Description: ${assignment["description"]}<br>
-            Graded: ${assignment["graded"]}<br>`)
+            `)
+            if (assignment["graded"] == "True") {
+              document.querySelector('.modal-body').innerHTML += "This assignment is <b>GRADED</b>";
+            }
+            else {
+              document.querySelector('.modal-body').innerHTML += "This assignment is <b>NOT GRADED</b>";
+            }
             if (assignment["url"] != "N/A")
             {
               document.querySelector('.modal-body').innerHTML += `URL: <a href="${assignment["url"]}" target="_blank">Link to assignment</a>`
