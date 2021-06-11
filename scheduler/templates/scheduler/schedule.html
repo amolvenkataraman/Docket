@@ -915,7 +915,7 @@
             td = new Date(dp.dataset.year, dp.dataset.month - 1, dp.dataset.date)
             if (d.toDateString() == td.toDateString())
             {
-              var ci = calendar_item({'class': a[i]['class'], 'i': i, 'type': "assignment", 'color': e[i]["class"]["colour"], 'text': a[i]['name'] + " [" + a[i]['class']['name'] + "]"})
+              var ci = calendar_item({'class': a[i]['class'], 'i': i, 'type': "assignment", 'color': a[i]["class"]["colour"], 'text': a[i]['name'] + " [" + a[i]['class']['name'] + "]"})
               dp.innerHTML += ci
             }
           })
