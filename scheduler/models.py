@@ -58,6 +58,7 @@ class Class(models.Model):
     students = models.ManyToManyField(DocketUser, related_name='class_student')
     room = models.ForeignKey(Room, on_delete=models.SET("DELETED ROOM"), related_name='class_room', null=True)
     period = models.ManyToManyField(Period, related_name='class_period')
+    colour = models.CharField(max_length=16, default='#000000')
     active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -71,6 +72,7 @@ class Class(models.Model):
             "period": [i.getinfo() for i in self.period.all()],
             "students": [i.getinfo() for i in self.students.all()],
             "active": str(self.active),
+            "colour": self.colour,
         }
 
         try:
@@ -78,8 +80,8 @@ class Class(models.Model):
         except AttributeError:
             pass
 
-        for i in self.period.all():
-            ans["period"].append(i.getinfo())
+        #for i in self.period.all():
+        #    ans["period"].append(i.getinfo())
 
         return ans
 
