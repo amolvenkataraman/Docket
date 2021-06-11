@@ -260,7 +260,7 @@ def add_from_gc(request):
 
 def stats(request):
     context = {
-        "users": DocketUser.objects.count(),
+        "users": len(DocketUser.objects.filter(newuser=True)),
         "classes": Class.objects.count(),
         "assignments": Assignment.objects.count(),
     }
