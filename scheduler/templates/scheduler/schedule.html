@@ -877,7 +877,7 @@
             }
             else
             {
-              var ci = calendar_item({'class': "", 'i': i, 'type': "org_event", 'color': "green", 'text': oe[i]['name']})
+              var ci = calendar_item({'class': "", 'i': i, 'type': "org_event", 'color': "black", 'text': oe[i]['name']})
               dp.innerHTML += ci
               if (oe[i]['holiday'] == true) {
                 dp.querySelector('span').style.color = "red"
@@ -899,7 +899,7 @@
 
             if ((sd >= td && td1 > ed) || (sd <= td && td1 < ed))
             {
-              var ci = calendar_item({'class': e[i]['class'], 'i': i, 'type': "event", 'color': "cornflowerblue", 'text': e[i]['name'] + " [" + e[i]['class']['name'] + "]"})
+              var ci = calendar_item({'class': e[i]['class'], 'i': i, 'type': "event", 'color': e[i]["class"]["colour"], 'text': e[i]['name'] + " [" + e[i]['class']['name'] + "]"})
               dp.innerHTML += ci
             }
           })
@@ -915,7 +915,7 @@
             td = new Date(dp.dataset.year, dp.dataset.month - 1, dp.dataset.date)
             if (d.toDateString() == td.toDateString())
             {
-              var ci = calendar_item({'class': a[i]['class'], 'i': i, 'type': "assignment", 'color': "black", 'text': a[i]['name'] + " [" + a[i]['class']['name'] + "]"})
+              var ci = calendar_item({'class': a[i]['class'], 'i': i, 'type': "assignment", 'color': e[i]["class"]["colour"], 'text': a[i]['name'] + " [" + a[i]['class']['name'] + "]"})
               dp.innerHTML += ci
             }
           })
