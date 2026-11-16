@@ -21,8 +21,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <!-- Handlebars.JS -->
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
-    <!-- Font Awesome JS -->
-    <script src="https://kit.fontawesome.com/fba5997caa.js" crossorigin="anonymous"></script>
+    <!-- Font Awesome Free CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <!-- UAParser.JS -->
     <script src="https://cdn.jsdelivr.net/npm/ua-parser-js@0/dist/ua-parser.min.js"></script>
 
@@ -213,7 +213,6 @@
 
     <nav class="navbar navbar-light bg-light sticky-bottom" style="height: 48px; position: fixed; bottom: 0; width: 100%;">
       <h5>Docket work organizer</h5>&nbsp&nbsp&nbspV 2.0&nbsp&nbsp&copy 2021 Amol Venkataraman&nbsp&nbsp&nbsp
-      <span><a href="https://docs.google.com/document/d/1LfifcRuJMuYJf1NSjMbRtOSdCsKnX169OlWy3pKtq2g/edit?usp=sharing">Usage Guide</a> | <a href="https://forms.gle/S7TSFuce2ZYiTYUd8">Feedback Form</a> | <a href="https://docs.google.com/spreadsheets/d/1jc6GkhfPudoHMwJukpij4Oyj_KiRB1jfaf7BVhkSBgA/edit?usp=sharing">Suggestion List</a></span>
     </nav>
 
     <button class="browser-modal-toggle" data-toggle="modal" data-target="#browser-modal" style="display: none;"></button>
@@ -240,8 +239,6 @@
           </div>
           <div class="modal-body">
             Thank you for taking your time to visit Docket. If you are here for the first time, click <a href="{% url 'register' %}">here</a> to register for a new account. Once you do that you will be able to access all the functionality of the website.
-            <b>Please read the <a href="https://docs.google.com/document/d/1LfifcRuJMuYJf1NSjMbRtOSdCsKnX169OlWy3pKtq2g/edit?usp=sharing">usage guide</a> before using the website.</b> When you are done, don't forget to fill out the <a href="https://forms.gle/S7TSFuce2ZYiTYUd8">feedback form</a>.
-            Links to the usage guide and feedback form will also be available in the bottom right corner of the page once logged in.
             <br><br>
             <span class="text-muted">Ignore this message if you have used Docket before.</span>
             <br><br>
