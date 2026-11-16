@@ -4,8 +4,6 @@
 > [!IMPORTANT]
 > **This repository is archived for preservation.** Docket is a 2020–21 project, kept to show that it existed. It isn't maintained and isn't meant for real use or deployment. Its dependencies are old and may have known security vulnerabilities. Use it only to look around, or to run it locally with fake data.
 
-# Docket
-
 Docket is a school planner web app built with Django. It puts a student's assignments, class events and school-wide events on one calendar, and builds their timetable from the classes they are enrolled in. Teachers create classes, post assignments and events, and hand out invite codes so students can join.
 
 I built it in 2020–2021, at about 15, when my school board moved to online learning and assignments were spread across Google Classroom, Brightspace, Zoom and Google Meet. It ran as a public demo on Heroku.
