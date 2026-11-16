@@ -1,6 +1,9 @@
 <!-- header:start -->
 <!-- header:end -->
 
+> [!IMPORTANT]
+> **This repository is archived for preservation.** Docket is a 2020–21 project, kept to show that it existed. It isn't maintained and isn't meant for real use or deployment. Its dependencies are old and may have known security vulnerabilities. Use it only to look around, or to run it locally with fake data.
+
 # Docket
 
 Docket is a school planner web app built with Django. It puts a student's assignments, class events and school-wide events on one calendar, and builds their timetable from the classes they are enrolled in. Teachers create classes, post assignments and events, and hand out invite codes so students can join.
@@ -95,10 +98,11 @@ Django doesn't read `.env` on its own. Export the variables in your shell, for e
 
 - **2020–2021:** I wrote Docket at about age 15. It started as a simple calendar in May 2020. Classes, invites, timetables and the map followed in the second half of 2020, and the Heroku demo went up in June 2021. In October 2021 I replaced the demo with a shutdown notice.
 - **Deployment:** it ran on Heroku (Gunicorn, django-heroku, WhiteNoise).
+- **What came next:** Docket is where [Nilaya](https://github.com/amolvenkataraman/Nilaya) began. In early 2021 I carried Docket's calendar into a new project, Comptech, which grew into Nilaya, my self-hosted family life platform.
 - **History:** the commit history here comes from the original repository, with the original author and commit dates.
 - **2026 cleanup:** before publishing, I scrubbed the history with `git filter-repo`:
   - Removed the database files and data dumps, which held real user accounts, along with uploaded profile pictures, school floor plans, `collectstatic` output and compiled `.pyc` files.
-  - Replaced the Django secret key, a Google API key, a school calendar ID and the school's name with placeholders in every commit.
+  - Replaced the Django secret key, a Google API key and a school calendar ID with placeholders in every commit, and replaced the school's name with "a Toronto high school".
 - **2026 additions:** the README, screenshots, license, `.gitignore` and a few small fixes so it runs again. These are separate, newer commits on top of the original history.
 
 ## License
