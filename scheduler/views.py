@@ -6,6 +6,7 @@ from django.db.models import Q
 from .models import *
 from .vars import *
 
+import os
 import requests
 import datetime
 import json
@@ -228,8 +229,8 @@ def settings(request):
 
 def add_from_gc(request):
     if request.user.is_superuser:
-        calendar_id = "REDACTED"
-        api_key = "REDACTED"
+        calendar_id = os.environ.get("GOOGLE_CALENDAR_ID", "")
+        api_key = os.environ.get("GOOGLE_API_KEY", "")
 
         start_time = request.GET["start"]
         end_time = request.GET["end"]
