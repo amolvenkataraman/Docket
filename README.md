@@ -1,4 +1,16 @@
 <!-- header:start -->
+<div align="center">
+
+<img alt="Docket: A school planner I built at 15: one calendar for assignments, class events and school-wide events." src=".github/assets/banner.svg" width="100%">
+
+![python: 3.9](https://img.shields.io/badge/python-3.9-0f6f68?labelColor=15181c&color=0f6f68)
+[![licence: MIT](https://img.shields.io/badge/licence-MIT-0f6f68?labelColor=15181c&color=0f6f68)](LICENSE)
+
+[Features](#features) · [Screenshots](#screenshots) · [Running it locally](#running-it-locally) · [History](#history)
+
+</div>
+
+<a href="https://haiscale.amolven.com/"><img alt="HAI Scale Code H (Fully human), README A1 (Mostly automated). I wrote Docket by hand in 2020–21. In 2026, AI made small fixes so it runs today, removed private data, and wrote this README and the screenshots. Archived for preservation. Provided as is, with no warranty." src=".github/assets/hai.svg" width="100%"></a>
 <!-- header:end -->
 
 > [!IMPORTANT]
