@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local database and dumps
+db.sqlite3
+*.sqlite3
+dump.json
+dump.sql
+
+# Uploaded media (ImageField paths are relative to the project folder)
+media/
+profile_pictures/
+map_images/
+whiteboards/
+chat_images/
+group_dm_icons/
+
+# collectstatic output
+staticfiles/
+
+# Secrets
+.env
+
+# Editors
+.idea/
+.vscode/
